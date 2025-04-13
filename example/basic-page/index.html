@@ -100,6 +100,24 @@
       margin-top: 15px;
       font-weight: bold;
     }
+    .result-item {
+      padding: 15px;
+      margin: 10px 0;
+      background-color: #f0f0f0;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      border-left: 4px solid #0051c3;
+      transition: transform 0.2s ease;
+    }
+    .result-item:hover {
+      transform: translateX(5px);
+    }
+    .result-item strong {
+      color: #0051c3;
+      display: block;
+      margin-bottom: 5px;
+      font-size: 16px;
+    }
   </style>
 </head>
 <body>
@@ -112,7 +130,18 @@
     <div id="progressText">0%</div>
     <div id="statusContainer">正在準備測試...</div>
   </div>
-  <div id="result"></div>
+  <div id="result">
+    <div style="text-align: center; padding: 20px; color: #666;">
+      <p>本測試將依序進行：</p>
+      <ol style="display: inline-block; text-align: left;">
+        <li>下載速度測試</li>
+        <li>上傳速度測試</li>
+        <li>抖動測試</li>
+        <li>延遲測試</li>
+      </ol>
+      <p>點擊上方「開始網路測速」按鈕開始測試</p>
+    </div>
+  </div>
 
   <script type="module">
     import SpeedTest from 'https://cdn.skypack.dev/@cloudflare/speedtest';
@@ -125,8 +154,9 @@
     const statusContainer = document.getElementById('statusContainer');
     
     let testProgress = 0;
-    let testStages = ['下載速度測試', '上傳速度測試', '延遲測試'];
+    let testStages = ['下載速度測試', '上傳速度測試', '抖動測試', '延遲測試'];
     let currentStage = 0;
+    let results = {};
     
     const engine = new SpeedTest({
       autoStart: false
@@ -137,6 +167,7 @@
         progressContainer.style.display = 'block';
         controlEl.textContent = '';
         statusContainer.textContent = '正在測試: ' + testStages[currentStage];
+        resEl.innerHTML = '';
       } else {
         progressBar.style.width = '100%';
         progressText.textContent = '100%';
@@ -148,34 +179,91 @@
       }
     };
     
+    function updateProgress(percent) {
+      testProgress = percent;
+      progressBar.style.width = testProgress + '%';
+      progressText.textContent = testProgress + '%';
+    }
+
+    function simulateProgress(duration, callback) {
+      let startTime = Date.now();
+      let interval = setInterval(() => {
+        let elapsed = Date.now() - startTime;
+        let progress = Math.min(Math.floor((elapsed / duration) * 100), 99);
+        updateProgress(progress);
+        
+        if (progress >= 99) {
+          clearInterval(interval);
+          if (callback) callback();
+        }
+      }, 100);
+      return interval;
+    }
+    
     engine.onResultsChange = ({ type }) => {
       if (engine.isFinished) return;
       
       console.log(type);
       
-      // 更新進度和階段
       if (type === 'download') {
-        currentStage = 0;
-        testProgress = 33;
-      } else if (type === 'upload') {
-        currentStage = 1;
-        testProgress = 66;
-      } else if (type === 'latency') {
-        currentStage = 2;
-        testProgress = 90;
+        results.download = engine.results.getSummary().download;
+        updateProgress(100);
+        displayItemResult('下載速度', (results.download / 1000000).toFixed(2) + ' Mbps');
+        
+        // 準備開始上傳測試
+        setTimeout(() => {
+          currentStage = 1;
+          updateProgress(0);
+          statusContainer.textContent = '正在測試: ' + testStages[currentStage];
+        }, 1000);
+      } 
+      else if (type === 'upload') {
+        results.upload = engine.results.getSummary().upload;
+        updateProgress(100);
+        displayItemResult('上傳速度', (results.upload / 1000000).toFixed(2) + ' Mbps');
+        
+        // 準備開始抖動測試
+        setTimeout(() => {
+          currentStage = 2;
+          updateProgress(0);
+          statusContainer.textContent = '正在測試: ' + testStages[currentStage];
+          
+          // 模擬抖動測試進度，因為抖動是從延遲計算出來的
+          let progressInterval = simulateProgress(2000, () => {
+            // 抖動測試完成
+            results.jitter = engine.results.getSummary().jitter || 0;
+            updateProgress(100);
+            displayItemResult('抖動', results.jitter.toFixed(2) + ' ms');
+            
+            // 準備開始延遲測試
+            setTimeout(() => {
+              currentStage = 3;
+              updateProgress(0);
+              statusContainer.textContent = '正在測試: ' + testStages[currentStage];
+            }, 1000);
+          });
+        }, 1000);
       }
-      
-      progressBar.style.width = testProgress + '%';
-      progressText.textContent = testProgress + '%';
-      statusContainer.textContent = '正在測試: ' + testStages[currentStage];
+      else if (type === 'latency') {
+        results.latency = engine.results.getSummary().latency;
+        updateProgress(100);
+        displayItemResult('延遲', results.latency.toFixed(2) + ' ms');
+      }
     };
     
+    function displayItemResult(name, value) {
+      let resultItem = document.createElement('div');
+      resultItem.className = 'result-item';
+      resultItem.innerHTML = `<strong>${name}</strong> ${value}`;
+      resEl.appendChild(resultItem);
+    }
+
     engine.onFinish = results => {
       const summary = results.getSummary();
       console.log(summary);
       console.log(results.getScores());
       
-      // 顯示分析結果而不是原始數據
+      // 完整結果將在所有測試完成後顯示
       displayResults(summary);
     };
 
@@ -198,6 +286,7 @@
       progressBar.style.width = '0%';
       progressText.textContent = '0%';
       resEl.textContent = '';
+      results = {};
     }
 
     function displayResults(data) {
