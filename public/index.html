@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>網路速度測試</title>
+  <style>
+    body {
+      font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      color: #333;
+      line-height: 1.6;
+    }
+    h1 {
+      color: #0051c3;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    #controls {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    #progressContainer {
+      display: none;
+      margin: 20px 0;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 20px;
+      background-color: #f0f0f0;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .progress {
+      height: 100%;
+      background-color: #0051c3;
+      width: 0%;
+      transition: width 0.5s;
+    }
+    #progressText {
+      text-align: center;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    button {
+      background-color: #0051c3;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #003da1;
+    }
+    #result {
+      background-color: #f9f9f9;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .result-section {
+      margin-bottom: 25px;
+    }
+    .result-section h3 {
+      color: #0051c3;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 8px;
+      margin-bottom: 15px;
+    }
+    .metric {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .metric-name {
+      font-weight: bold;
+    }
+    .good {
+      color: #28a745;
+    }
+    .warning {
+      color: #ffc107;
+    }
+    .poor {
+      color: #dc3545;
+    }
+    .overall-rating {
+      text-align: center;
+      font-size: 18px;
+      margin: 20px 0;
+      font-weight: bold;
+    }
+    #statusContainer {
+      text-align: center;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>蓋斯克網路速度測試</h1>
+  <div id="controls"></div>
+  <div id="progressContainer">
+    <div class="progress-bar">
+      <div id="progressBar" class="progress"></div>
+    </div>
+    <div id="progressText">0%</div>
+    <div id="statusContainer">正在準備測試...</div>
+  </div>
+  <div id="result"></div>
+
+  <script type="module">
+    import SpeedTest from 'https://cdn.skypack.dev/@cloudflare/speedtest';
+
+    const controlEl = document.getElementById('controls');
+    const resEl = document.getElementById('result');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    const statusContainer = document.getElementById('statusContainer');
+    
+    let testProgress = 0;
+    let testStages = ['下載速度測試', '上傳速度測試', '延遲測試'];
+    let currentStage = 0;
+    
+    const engine = new SpeedTest({
+      autoStart: false
+    });
+    
+    engine.onRunningChange = running => {
+      if (running) {
+        progressContainer.style.display = 'block';
+        controlEl.textContent = '';
+        statusContainer.textContent = '正在測試: ' + testStages[currentStage];
+      } else {
+        progressBar.style.width = '100%';
+        progressText.textContent = '100%';
+        statusContainer.textContent = '測試完成!';
+        setTimeout(() => {
+          progressContainer.style.display = 'none';
+          controlEl.textContent = '測試完成!';
+        }, 1000);
+      }
+    };
+    
+    engine.onResultsChange = ({ type }) => {
+      if (engine.isFinished) return;
+      
+      console.log(type);
+      
+      // 更新進度和階段
+      if (type === 'download') {
+        currentStage = 0;
+        testProgress = 33;
+      } else if (type === 'upload') {
+        currentStage = 1;
+        testProgress = 66;
+      } else if (type === 'latency') {
+        currentStage = 2;
+        testProgress = 90;
+      }
+      
+      progressBar.style.width = testProgress + '%';
+      progressText.textContent = testProgress + '%';
+      statusContainer.textContent = '正在測試: ' + testStages[currentStage];
+    };
+    
+    engine.onFinish = results => {
+      const summary = results.getSummary();
+      console.log(summary);
+      console.log(results.getScores());
+      
+      // 顯示分析結果而不是原始數據
+      displayResults(summary);
+    };
+
+    engine.onError = (e) => {
+      console.log(e);
+      statusContainer.textContent = '測試出錯: ' + e.message;
+    };
+
+    const playButton = document.createElement('button');
+    playButton.textContent = "開始網路測速";
+    playButton.onclick = () => {
+      resetProgress();
+      engine.play();
+    };
+    controlEl.appendChild(playButton);
+    
+    function resetProgress() {
+      testProgress = 0;
+      currentStage = 0;
+      progressBar.style.width = '0%';
+      progressText.textContent = '0%';
+      resEl.textContent = '';
+    }
+
+    function displayResults(data) {
+      resEl.innerHTML = '';
+      
+      // 創建結果容器
+      const resultContent = document.createElement('div');
+      
+      // 添加標題
+      const title = document.createElement('h2');
+      title.textContent = '網路速度測試結果分析';
+      resultContent.appendChild(title);
+      
+      // 基本網路參數部分
+      const basicSection = document.createElement('div');
+      basicSection.className = 'result-section';
+      
+      const basicTitle = document.createElement('h3');
+      basicTitle.textContent = '基本網路參數';
+      basicSection.appendChild(basicTitle);
+      
+      // 下載速度
+      const downloadMbps = (data.download / 1000000).toFixed(2);
+      const downloadMBps = (downloadMbps / 8).toFixed(2);
+      addMetric(basicSection, '下載速度', `${downloadMbps} Mbps (${downloadMBps} MB/s)`, getRatingClass(downloadMbps, 50, 100));
+      addDetail(basicSection, `這相當於每秒約 ${downloadMBps} MB 的下載速度`);
+      
+      if (downloadMbps > 100) {
+        addDetail(basicSection, '非常適合高清視頻流、大文件下載和多設備同時使用');
+      } else if (downloadMbps > 25) {
+        addDetail(basicSection, '適合多數網路活動，包括視頻流和一般下載需求');
+      } else {
+        addDetail(basicSection, '足夠基本的網頁瀏覽，但高清視頻流可能會有困難');
+      }
+      
+      // 上傳速度
+      const uploadMbps = (data.upload / 1000000).toFixed(2);
+      const uploadMBps = (uploadMbps / 8).toFixed(2);
+      addMetric(basicSection, '上傳速度', `${uploadMbps} Mbps (${uploadMBps} MB/s)`, getRatingClass(uploadMbps, 5, 20));
+      addDetail(basicSection, `相當於每秒約 ${uploadMBps} MB 的上傳速度`);
+      
+      if (uploadMbps > 20) {
+        addDetail(basicSection, '非常適合視頻會議、快速文件上傳和雲備份');
+      } else if (uploadMbps > 5) {
+        addDetail(basicSection, '足夠進行視頻通話、上傳文件和雲備份');
+      } else {
+        addDetail(basicSection, '可以進行基本的上傳任務，但大文件上傳可能較慢');
+      }
+      
+      resultContent.appendChild(basicSection);
+      
+      // 網路質量參數部分
+      const qualitySection = document.createElement('div');
+      qualitySection.className = 'result-section';
+      
+      const qualityTitle = document.createElement('h3');
+      qualityTitle.textContent = '網路質量參數';
+      qualitySection.appendChild(qualityTitle);
+      
+      // 延遲（基礎）
+      const latency = data.latency.toFixed(2);
+      addMetric(qualitySection, '延遲（基礎）', `${latency} 毫秒`, getRatingClass(50 - latency, 0, 30));
+      addDetail(qualitySection, '這是網路請求的往返時間');
+      
+      if (latency < 20) {
+        addDetail(qualitySection, '極佳的延遲，適合競技遊戲和實時應用');
+      } else if (latency < 50) {
+        addDetail(qualitySection, '這個延遲值適合一般網頁瀏覽和視頻通話');
+      } else {
+        addDetail(qualitySection, '可能會在視頻通話和在線遊戲中感到一些延遲');
+      }
+      
+      // 抖動（基礎）
+      const jitter = data.jitter.toFixed(2);
+      addMetric(qualitySection, '抖動（基礎）', `${jitter} 毫秒`, getRatingClass(30 - jitter, 0, 20));
+      addDetail(qualitySection, '表示延遲變化的程度');
+      
+      if (jitter < 5) {
+        addDetail(qualitySection, '極低的抖動，網路非常穩定');
+      } else if (jitter < 30) {
+        addDetail(qualitySection, '在可接受範圍內，大多數應用不會受到影響');
+      } else {
+        addDetail(qualitySection, '較高的抖動可能導致視頻通話和遊戲出現卡頓');
+      }
+      
+      // 下載時延遲
+      if (data.downLoadedLatency) {
+        const dlLatency = data.downLoadedLatency.toFixed(2);
+        addMetric(qualitySection, '下載時延遲', `${dlLatency} 毫秒`, getRatingClass(60 - dlLatency, 0, 30));
+        addDetail(qualitySection, '在進行下載時測量的延遲');
+        addDetail(qualitySection, '在下載過程中延遲有所增加，這是正常現象');
+      }
+      
+      // 下載時抖動
+      if (data.downLoadedJitter) {
+        const dlJitter = data.downLoadedJitter.toFixed(2);
+        addMetric(qualitySection, '下載時抖動', `${dlJitter} 毫秒`, getRatingClass(30 - dlJitter, 0, 20));
+        addDetail(qualitySection, `下載過程中的抖動${dlJitter < jitter ? '降低' : '增加'}了`);
+      }
+      
+      // 上傳時延遲
+      if (data.upLoadedLatency) {
+        const ulLatency = data.upLoadedLatency.toFixed(2);
+        addMetric(qualitySection, '上傳時延遲', `${ulLatency} 毫秒`, getRatingClass(70 - ulLatency, 0, 30));
+        addDetail(qualitySection, '上傳過程中測量的延遲');
+        addDetail(qualitySection, '比基礎延遲高，因為上傳會佔用更多頻寬');
+      }
+      
+      // 上傳時抖動
+      if (data.upLoadedJitter) {
+        const ulJitter = data.upLoadedJitter.toFixed(2);
+        addMetric(qualitySection, '上傳時抖動', `${ulJitter} 毫秒`, getRatingClass(50 - ulJitter, 0, 30));
+        if (ulJitter > 50) {
+          addDetail(qualitySection, '上傳過程中抖動明顯增加');
+          addDetail(qualitySection, '這可能會在視頻會議等應用中造成一些不穩定');
+        } else {
+          addDetail(qualitySection, '上傳過程中的抖動在可接受範圍內');
+        }
+      }
+      
+      // 丟包率
+      if (data.packetLoss !== undefined) {
+        const packetLoss = data.packetLoss.toFixed(2);
+        addMetric(qualitySection, '丟包率', `${packetLoss}%`, packetLoss === 0 ? 'good' : (packetLoss < 2 ? 'warning' : 'poor'));
+        
+        if (packetLoss === 0) {
+          addDetail(qualitySection, '完美的丟包率，表示數據傳輸非常可靠');
+        } else if (packetLoss < 2) {
+          addDetail(qualitySection, '丟包率較低，大多數應用不會受到明顯影響');
+        } else {
+          addDetail(qualitySection, '丟包率較高，可能會影響視頻通話和遊戲體驗');
+        }
+      }
+      
+      resultContent.appendChild(qualitySection);
+      
+      // 總體評價
+      const overallSection = document.createElement('div');
+      overallSection.className = 'result-section';
+      
+      const overallTitle = document.createElement('h3');
+      overallTitle.textContent = '總體評價';
+      overallSection.appendChild(overallTitle);
+      
+      // 計算總體評分
+      let overallScore = 0;
+      
+      // 下載速度評分 (0-5分)
+      let downloadScore = Math.min(5, downloadMbps / 20);
+      
+      // 上傳速度評分 (0-5分)
+      let uploadScore = Math.min(5, uploadMbps / 4);
+      
+      // 延遲評分 (0-5分)
+      let latencyScore = Math.min(5, Math.max(0, 6 - (latency / 20)));
+      
+      // 抖動評分 (0-5分)
+      let jitterScore = Math.min(5, Math.max(0, 5 - (jitter / 10)));
+      
+      // 丟包評分 (0-5分)
+      let packetLossScore = data.packetLoss === 0 ? 5 : Math.max(0, 5 - data.packetLoss * 2.5);
+      
+      // 計算加權總分 (滿分100)
+      overallScore = (downloadScore * 35 + uploadScore * 20 + latencyScore * 20 + jitterScore * 15 + packetLossScore * 10) / 5;
+      
+      let overallRating = '';
+      let overallClass = '';
+      
+      if (overallScore >= 90) {
+        overallRating = '極佳';
+        overallClass = 'good';
+      } else if (overallScore >= 70) {
+        overallRating = '良好';
+        overallClass = 'good';
+      } else if (overallScore >= 50) {
+        overallRating = '一般';
+        overallClass = 'warning';
+      } else {
+        overallRating = '較差';
+        overallClass = 'poor';
+      }
+      
+      const overallDiv = document.createElement('div');
+      overallDiv.className = 'overall-rating';
+      overallDiv.innerHTML = `您的網路質量總體評價: <span class="${overallClass}">${overallRating}</span> (${Math.round(overallScore)}/100)`;
+      overallSection.appendChild(overallDiv);
+      
+      // 總體評價文字
+      const overallText = document.createElement('p');
+      overallText.textContent = '您的網路連接整體表現' + (overallScore >= 70 ? '良好' : (overallScore >= 50 ? '一般' : '較弱')) + '：';
+      overallSection.appendChild(overallText);
+      
+      const overallList = document.createElement('ul');
+      
+      if (downloadMbps > 100) {
+        addListItem(overallList, '下載速度非常快，適合幾乎所有網路活動');
+      } else if (downloadMbps > 25) {
+        addListItem(overallList, '下載速度良好，適合大多數日常使用');
+      } else {
+        addListItem(overallList, '下載速度一般，基本網路活動可能較慢');
+      }
+      
+      if (uploadMbps > 20) {
+        addListItem(overallList, '上傳速度優秀，適合視頻會議和大文件上傳');
+      } else if (uploadMbps > 5) {
+        addListItem(overallList, '上傳速度足夠日常使用，但對於大文件上傳可能會感覺較慢');
+      } else {
+        addListItem(overallList, '上傳速度較慢，可能不適合視頻會議或頻繁上傳');
+      }
+      
+      if (latency < 30) {
+        addListItem(overallList, '延遲很低，適合實時在線遊戲和視頻通話');
+      } else if (latency < 70) {
+        addListItem(overallList, '延遲適中，適合大多數在線活動');
+      } else {
+        addListItem(overallList, '延遲較高，可能會影響實時應用體驗');
+      }
+      
+      if (data.upLoadedJitter > 50) {
+        addListItem(overallList, '上傳時的高抖動可能會在視頻通話或在線遊戲中偶爾造成卡頓');
+      }
+      
+      overallSection.appendChild(overallList);
+      
+      const conclusion = document.createElement('p');
+      if (overallScore >= 70) {
+        conclusion.textContent = '這個連接非常適合家庭或小型辦公室使用，能夠滿足多人同時使用的需求。';
+        if (latency > 50 || data.upLoadedJitter > 70) {
+          conclusion.textContent += '如果您需要進行對延遲敏感的活動（如競技遊戲），可能需要考慮提升網路穩定性。';
+        }
+      } else if (overallScore >= 50) {
+        conclusion.textContent = '這個連接足夠一般家庭基本使用，但多人同時使用高頻寬應用可能會遇到問題。';
+      } else {
+        conclusion.textContent = '這個連接可能不適合高強度的網路活動，建議聯繫您的網路服務提供商了解升級選項。';
+      }
+      overallSection.appendChild(conclusion);
+      
+      resultContent.appendChild(overallSection);
+      
+      resEl.appendChild(resultContent);
+    }
+    
+    function addMetric(container, name, value, ratingClass) {
+      const metric = document.createElement('div');
+      metric.className = 'metric';
+      
+      const metricName = document.createElement('div');
+      metricName.className = 'metric-name';
+      metricName.textContent = name;
+      
+      const metricValue = document.createElement('div');
+      metricValue.className = 'metric-value ' + ratingClass;
+      metricValue.textContent = value;
+      
+      metric.appendChild(metricName);
+      metric.appendChild(metricValue);
+      container.appendChild(metric);
+    }
+    
+    function addDetail(container, text) {
+      const detail = document.createElement('div');
+      detail.className = 'detail';
+      detail.textContent = text;
+      detail.style.paddingLeft = '20px';
+      detail.style.fontSize = '14px';
+      detail.style.color = '#666';
+      container.appendChild(detail);
+    }
+    
+    function addListItem(list, text) {
+      const item = document.createElement('li');
+      item.textContent = text;
+      list.appendChild(item);
+    }
+    
+    function getRatingClass(value, warningThreshold, goodThreshold) {
+      if (value <= 0) return 'poor';
+      if (value < warningThreshold) return 'poor';
+      if (value < goodThreshold) return 'warning';
+      return 'good';
+    }
+  </script>
+</body>
+</html>

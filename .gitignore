@@ -1,0 +1,25 @@
+# Firebase
+.firebase/
+firebase-debug.log
+.runtimeconfig.json
+*-firebase-adminsdk-*.json
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# IDE files
+.cursor/
+.idea/
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# 忽略包含敏感信息的文件
+.mcp.json
