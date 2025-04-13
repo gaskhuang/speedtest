@@ -204,6 +204,35 @@
         padding: 10px;
       }
     }
+    /* 按鈕容器樣式 */
+    .action-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin: 30px 0;
+    }
+    .action-button {
+      background-color: #0051c3;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .action-button:hover {
+      background-color: #003da1;
+    }
+    .action-button.green {
+      background-color: #28a745;
+    }
+    .action-button.green:hover {
+      background-color: #218838;
+    }
   </style>
 </head>
 <body>
@@ -263,6 +292,8 @@
 
   <script type="module">
     import SpeedTest from 'https://cdn.skypack.dev/@cloudflare/speedtest';
+    // 引入html2canvas庫用於將頁面轉換為圖片
+    import html2canvas from 'https://cdn.skypack.dev/html2canvas';
 
     const controlEl = document.getElementById('controls');
     const resEl = document.getElementById('result');
@@ -293,52 +324,150 @@
     let testStages = ['下載速度測試', '上傳速度測試', '抖動測試', '遺失封包測試'];
     let currentStage = 0;
     let results = {};
+    let engine = null;
+    let testIntervals = [];
     
-    const engine = new SpeedTest({
-      autoStart: false
-    });
-    
-    engine.onRunningChange = running => {
-      if (running) {
-        progressContainer.style.display = 'block';
-        controlEl.textContent = '';
-        statusContainer.textContent = '測試正在進行中...';
-        
-        // 隱藏介紹文字
-        const introText = document.getElementById('intro-text');
-        if (introText) {
-          introText.style.display = 'none';
+    // 初始化測試引擎
+    function initSpeedTest() {
+      // 如果已有實例，先取消所有監聽
+      if (engine) {
+        try {
+          engine.abort();
+        } catch (e) {
+          console.error('停止測試時出錯:', e);
         }
-        
-        // 初始化所有進度條
-        downloadProgressBar.style.width = '0%';
-        uploadProgressBar.style.width = '0%';
-        jitterProgressBar.style.width = '0%';
-        packetLossProgressBar.style.width = '0%';
-        
-        downloadProgressText.textContent = '等待中...';
-        uploadProgressText.textContent = '等待中...';
-        jitterProgressText.textContent = '等待中...';
-        packetLossProgressText.textContent = '等待中...';
-        
-        downloadResult.textContent = '';
-        uploadResult.textContent = '';
-        jitterResult.textContent = '';
-        packetLossResult.textContent = '';
-        
-        // 開始下載測試進度模擬
-        simulateTestProgress('download');
-      } else {
-        statusContainer.textContent = '測試完成!';
-        setTimeout(() => {
-          progressContainer.style.display = 'none';
-          controlEl.textContent = '測試完成!';
-          
-          // 顯示詳細測試報告
-          displayResults(engine.results.getSummary());
-        }, 2000);
       }
+      
+      // 清除所有進行中的計時器
+      testIntervals.forEach(interval => clearInterval(interval));
+      testIntervals = [];
+      
+      // 創建新的測試引擎
+      engine = new SpeedTest({
+        autoStart: false
+      });
+      
+      engine.onRunningChange = running => {
+        if (running) {
+          progressContainer.style.display = 'block';
+          controlEl.textContent = '';
+          statusContainer.textContent = '測試正在進行中...';
+          
+          // 隱藏介紹文字
+          const introText = document.getElementById('intro-text');
+          if (introText) {
+            introText.style.display = 'none';
+          }
+          
+          // 初始化所有進度條
+          downloadProgressBar.style.width = '0%';
+          uploadProgressBar.style.width = '0%';
+          jitterProgressBar.style.width = '0%';
+          packetLossProgressBar.style.width = '0%';
+          
+          downloadProgressText.textContent = '等待中...';
+          uploadProgressText.textContent = '等待中...';
+          jitterProgressText.textContent = '等待中...';
+          packetLossProgressText.textContent = '等待中...';
+          
+          downloadResult.textContent = '';
+          uploadResult.textContent = '';
+          jitterResult.textContent = '';
+          packetLossResult.textContent = '';
+          
+          // 開始下載測試進度模擬
+          const downloadInterval = simulateTestProgress('download');
+          testIntervals.push(downloadInterval);
+        } else {
+          statusContainer.textContent = '測試完成!';
+          setTimeout(() => {
+            progressContainer.style.display = 'none';
+            controlEl.textContent = '測試完成!';
+            
+            // 顯示詳細測試報告
+            if (engine && engine.results) {
+              displayResults(engine.results.getSummary());
+            } else {
+              console.error('無法獲取測試結果');
+              statusContainer.textContent = '測試失敗，請重試';
+            }
+          }, 2000);
+        }
+      };
+      
+      engine.onResultsChange = ({ type }) => {
+        if (!engine || engine.isFinished) return;
+        
+        console.log(type);
+        
+        if (type === 'download') {
+          results.download = engine.results.getSummary().download;
+          updateTestProgress('download', 100);
+          downloadResult.textContent = (results.download / 1000000).toFixed(2) + ' Mbps';
+          
+          // 開始上傳測試進度模擬
+          const uploadInterval = simulateTestProgress('upload');
+          testIntervals.push(uploadInterval);
+        } 
+        else if (type === 'upload') {
+          results.upload = engine.results.getSummary().upload;
+          updateTestProgress('upload', 100);
+          uploadResult.textContent = (results.upload / 1000000).toFixed(2) + ' Mbps';
+          
+          // 開始抖動測試
+          const jitterInterval = simulateTestProgress('jitter');
+          testIntervals.push(jitterInterval);
+        }
+        else if (type === 'latency') {
+          results.latency = engine.results.getSummary().latency;
+          
+          // 抖動結果從延遲測試中獲取
+          if (engine.results.getSummary().jitter) {
+            results.jitter = engine.results.getSummary().jitter;
+            updateTestProgress('jitter', 100);
+            jitterResult.textContent = results.jitter.toFixed(2) + ' ms';
+          }
+          
+          // 開始丟包測試
+          const packetLossInterval = simulateTestProgress('packetLoss');
+          testIntervals.push(packetLossInterval);
+          
+          // 模擬丟包測試結果
+          setTimeout(() => {
+            if (engine && engine.results) {
+              results.packetLoss = engine.results.getSummary().packetLoss || 0;
+              updateTestProgress('packetLoss', 100);
+              packetLossResult.textContent = results.packetLoss.toFixed(2) + '%';
+            }
+          }, 3500);
+        }
+      };
+      
+      engine.onFinish = results => {
+        const summary = results.getSummary();
+        console.log(summary);
+        console.log(results.getScores());
+        
+        // 詳細測試報告會由 onRunningChange 中的回調顯示
+      };
+
+      engine.onError = (e) => {
+        console.log(e);
+        statusContainer.textContent = '測試出錯: ' + e.message;
+      };
+    }
+    
+    // 初始化引擎
+    initSpeedTest();
+    
+    // 創建開始測試按鈕
+    const playButton = document.createElement('button');
+    playButton.textContent = "開始網路測速";
+    playButton.onclick = () => {
+      // 確保測試引擎已正確初始化
+      resetTest();
     };
+    controlEl.appendChild(playButton);
     
     function updateTestProgress(testType, percent) {
       requestAnimationFrame(() => {
@@ -401,69 +530,52 @@
       return interval;
     }
     
-    engine.onResultsChange = ({ type }) => {
-      if (engine.isFinished) return;
-      
-      console.log(type);
-      
-      if (type === 'download') {
-        results.download = engine.results.getSummary().download;
-        updateTestProgress('download', 100);
-        downloadResult.textContent = (results.download / 1000000).toFixed(2) + ' Mbps';
-        
-        // 開始上傳測試進度模擬
-        simulateTestProgress('upload');
-      } 
-      else if (type === 'upload') {
-        results.upload = engine.results.getSummary().upload;
-        updateTestProgress('upload', 100);
-        uploadResult.textContent = (results.upload / 1000000).toFixed(2) + ' Mbps';
-        
-        // 開始抖動測試
-        simulateTestProgress('jitter');
-      }
-      else if (type === 'latency') {
-        results.latency = engine.results.getSummary().latency;
-        
-        // 抖動結果從延遲測試中獲取
-        if (engine.results.getSummary().jitter) {
-          results.jitter = engine.results.getSummary().jitter;
-          updateTestProgress('jitter', 100);
-          jitterResult.textContent = results.jitter.toFixed(2) + ' ms';
-        }
-        
-        // 開始丟包測試
-        simulateTestProgress('packetLoss');
-        
-        // 模擬丟包測試結果
-        setTimeout(() => {
-          results.packetLoss = engine.results.getSummary().packetLoss || 0;
-          updateTestProgress('packetLoss', 100);
-          packetLossResult.textContent = results.packetLoss.toFixed(2) + '%';
-        }, 3500);
-      }
-    };
-    
-    engine.onFinish = results => {
-      const summary = results.getSummary();
-      console.log(summary);
-      console.log(results.getScores());
-      
-      // 詳細測試報告會由 onRunningChange 中的回調顯示
-    };
-
-    engine.onError = (e) => {
-      console.log(e);
-      statusContainer.textContent = '測試出錯: ' + e.message;
-    };
-
-    const playButton = document.createElement('button');
-    playButton.textContent = "開始網路測速";
-    playButton.onclick = () => {
+    // 完全重置測試的函數
+    function resetTest() {
       resetProgress();
-      engine.play();
-    };
-    controlEl.appendChild(playButton);
+      initSpeedTest();
+      
+      // 重置界面
+      resEl.innerHTML = '';
+      const introText = document.createElement('div');
+      introText.id = 'intro-text';
+      introText.style.textAlign = 'center';
+      introText.style.padding = '20px';
+      introText.style.color = '#666';
+      
+      const p1 = document.createElement('p');
+      p1.textContent = '本測試將依序進行：';
+      introText.appendChild(p1);
+      
+      const ol = document.createElement('ol');
+      ol.style.display = 'inline-block';
+      ol.style.textAlign = 'left';
+      
+      const stages = ['下載速度測試', '上傳速度測試', '抖動測試', '遺失封包測試'];
+      stages.forEach(stage => {
+        const li = document.createElement('li');
+        li.textContent = stage;
+        ol.appendChild(li);
+      });
+      
+      introText.appendChild(ol);
+      
+      const p2 = document.createElement('p');
+      p2.textContent = '測試進行中，請稍候...';
+      introText.appendChild(p2);
+      
+      resEl.appendChild(introText);
+      
+      // 開始新測試
+      setTimeout(() => {
+        if (engine) {
+          engine.play();
+        } else {
+          console.error('測試引擎未初始化');
+          statusContainer.textContent = '測試初始化失敗，請重新載入頁面';
+        }
+      }, 500);
+    }
     
     function resetProgress() {
       testProgress = 0;
@@ -726,7 +838,97 @@
       
       resultContent.appendChild(overallSection);
       
+      // 創建按鈕容器
+      const actionButtons = document.createElement('div');
+      actionButtons.className = 'action-buttons';
+      
+      // 創建保存圖片按鈕
+      const saveButton = document.createElement('button');
+      saveButton.className = 'action-button';
+      saveButton.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19 21H5C3.89543 21 3 20.1046 3 19V5C3 3.89543 3.89543 3 5 3H14.5858C14.851 3 15.1054 3.10536 15.2929 3.29289L20.7071 8.70711C20.8946 8.89464 21 9.149 21 9.41421V19C21 20.1046 20.1046 21 19 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.6 9H15.4C15.7314 9 16 8.73137 16 8.4V3.6C16 3.26863 15.7314 3 15.4 3H8.6C8.26863 3 8 3.26863 8 3.6V8.4C8 8.73137 8.26863 9 8.6 9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 21V15C8 13.8954 8.89543 13 10 13H14C15.1046 13 16 13.8954 16 15V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> 儲存圖片';
+      saveButton.onclick = saveAsImage;
+      actionButtons.appendChild(saveButton);
+      
+      // 創建再次測試按鈕
+      const retestButton = document.createElement('button');
+      retestButton.className = 'action-button green';
+      retestButton.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17.6569 16.6569C16.7202 17.5935 15.4891 18.2475 14.1435 18.5241C12.7979 18.8007 11.403 18.6863 10.1329 18.1938C8.86271 17.7013 7.76536 16.8501 6.97747 15.7442C6.18959 14.6383 5.74673 13.3282 5.69992 11.9793C5.65312 10.6304 6.00422 9.29499 6.71103 8.14207C7.41783 6.98915 8.4553 6.06865 9.69966 5.50427C10.944 4.93989 12.3401 4.75236 13.7172 4.96472C15.0943 5.17707 16.3841 5.78078 17.4262 6.69705L20 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 3V9H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> 再測試一次';
+      retestButton.onclick = resetTest;
+      actionButtons.appendChild(retestButton);
+      
+      resultContent.appendChild(actionButtons);
+      
       resEl.appendChild(resultContent);
+    }
+    
+    // 保存測試結果為圖片的函數
+    function saveAsImage() {
+      const resultEl = document.getElementById('result');
+      const saveButton = document.querySelector('.action-button');
+      
+      // 暫時隱藏按鈕以避免其出現在截圖中
+      const actionButtons = document.querySelector('.action-buttons');
+      const originalDisplay = actionButtons.style.display;
+      actionButtons.style.display = 'none';
+      
+      // 顯示正在處理的提示
+      const processingMsg = document.createElement('div');
+      processingMsg.textContent = '正在生成圖片...';
+      processingMsg.style.textAlign = 'center';
+      processingMsg.style.margin = '20px 0';
+      processingMsg.style.fontWeight = 'bold';
+      resultEl.appendChild(processingMsg);
+      
+      // 生成圖片
+      html2canvas(resultEl, {
+        backgroundColor: '#f8f9fa',
+        scale: 2, // 提高圖片質量
+        logging: false,
+        onclone: (clonedDoc) => {
+          // 在克隆的文檔中也隱藏按鈕
+          const clonedButtons = clonedDoc.querySelector('.action-buttons');
+          if (clonedButtons) clonedButtons.style.display = 'none';
+          
+          // 刪除克隆文檔中的處理信息
+          const clonedMsg = clonedDoc.querySelector('#result > div:last-child');
+          if (clonedMsg && clonedMsg.textContent === '正在生成圖片...') {
+            clonedMsg.remove();
+          }
+        }
+      }).then(canvas => {
+        // 移除處理提示
+        processingMsg.remove();
+        
+        // 顯示按鈕
+        actionButtons.style.display = originalDisplay;
+        
+        // 轉換為圖片並下載
+        const link = document.createElement('a');
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        link.download = `網路速度測試結果_${timestamp}.jpg`;
+        link.href = canvas.toDataURL('image/jpeg', 0.8);
+        link.click();
+      }).catch(err => {
+        console.error('生成圖片時出錯：', err);
+        
+        // 移除處理提示
+        processingMsg.remove();
+        
+        // 顯示按鈕
+        actionButtons.style.display = originalDisplay;
+        
+        // 顯示錯誤信息
+        const errorMsg = document.createElement('div');
+        errorMsg.textContent = '無法生成圖片，請稍後再試。';
+        errorMsg.style.color = 'red';
+        errorMsg.style.textAlign = 'center';
+        errorMsg.style.margin = '20px 0';
+        
+        // 5秒後移除錯誤信息
+        setTimeout(() => errorMsg.remove(), 5000);
+        
+        resultEl.appendChild(errorMsg);
+      });
     }
     
     function addMetric(container, name, value, ratingClass) {
