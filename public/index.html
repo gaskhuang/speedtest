@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,24 +15,28 @@
       line-height: 1.6;
       background-color: #f8f9fa;
     }
+
     h1 {
       color: #0051c3;
       text-align: center;
       margin-bottom: 30px;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
     }
+
     #controls {
       text-align: center;
       margin-bottom: 30px;
     }
+
     #progressContainer {
       display: none;
       margin: 20px 0;
       background-color: #fff;
       padding: 20px;
       border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
     }
+
     .progress-bar {
       width: 100%;
       height: 20px;
@@ -40,17 +45,20 @@
       overflow: hidden;
       margin-bottom: 5px;
     }
+
     .progress {
       height: 100%;
       background-color: #0051c3;
       width: 0%;
       transition: width 0.3s ease-in-out;
     }
+
     #progressText {
       text-align: center;
       margin-top: 10px;
       font-weight: bold;
     }
+
     button {
       background-color: #0051c3;
       color: white;
@@ -61,71 +69,86 @@
       cursor: pointer;
       transition: background-color 0.3s;
     }
+
     button:hover {
       background-color: #003da1;
     }
+
     #result {
       background-color: #fff;
       padding: 20px;
       border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
     }
+
     .result-section {
       margin-bottom: 25px;
     }
+
     .result-section h3 {
       color: #0051c3;
       border-bottom: 1px solid #ddd;
       padding-bottom: 8px;
       margin-bottom: 15px;
     }
+
     .metric {
       display: flex;
       justify-content: space-between;
       margin-bottom: 10px;
     }
+
     .metric-name {
       font-weight: bold;
     }
+
     .good {
       color: #28a745;
     }
+
     .warning {
       color: #ffc107;
     }
+
     .poor {
       color: #dc3545;
     }
+
     .overall-rating {
       text-align: center;
       font-size: 18px;
       margin: 20px 0;
       font-weight: bold;
     }
+
     #statusContainer {
       text-align: center;
       margin-top: 15px;
       font-weight: bold;
     }
+
     .result-item {
       padding: 15px;
       margin: 10px 0;
       background-color: #f8f9fa;
       border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
       border-left: 4px solid #0051c3;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
+
     .result-item:hover {
       transform: translateX(5px);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     }
+
     .result-item strong {
       color: #0051c3;
       display: block;
       margin-bottom: 5px;
       font-size: 16px;
     }
+
     .test-info {
       text-align: center;
       padding: 15px;
@@ -137,11 +160,21 @@
       font-weight: bold;
       animation: pulse 2s infinite;
     }
+
     @keyframes pulse {
-      0% { opacity: 0.7; }
-      50% { opacity: 1; }
-      100% { opacity: 0.7; }
+      0% {
+        opacity: 0.7;
+      }
+
+      50% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0.7;
+      }
     }
+
     .recommendation {
       background-color: #f0f7ff;
       padding: 15px;
@@ -149,16 +182,19 @@
       margin-top: 20px;
       border-left: 4px solid #28a745;
     }
+
     .recommendation h4 {
       color: #28a745;
       margin-top: 0;
     }
+
     .score-breakdown {
       background-color: #f8f9fa;
       padding: 15px;
       border-radius: 8px;
       margin: 15px 0;
     }
+
     .score-item {
       display: flex;
       justify-content: space-between;
@@ -166,9 +202,11 @@
       border-bottom: 1px dashed #ddd;
       padding-bottom: 8px;
     }
+
     .score-label {
       font-weight: bold;
     }
+
     .total-score {
       font-weight: bold;
       font-size: 18px;
@@ -177,33 +215,39 @@
       border-top: 2px solid #ddd;
       padding-top: 5px;
     }
+
     .test-item {
       margin-bottom: 15px;
       background-color: white;
       padding: 15px;
       border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
+
     .test-label {
       font-weight: bold;
       margin-bottom: 8px;
       color: #0051c3;
     }
+
     .progress-text {
       font-size: 14px;
       color: #666;
       margin-bottom: 5px;
     }
+
     .test-result {
       font-weight: bold;
       color: #28a745;
       height: 20px;
     }
+
     @media (max-width: 600px) {
       body {
         padding: 10px;
       }
     }
+
     /* 按鈕容器樣式 */
     .action-buttons {
       display: flex;
@@ -211,6 +255,7 @@
       gap: 15px;
       margin: 30px 0;
     }
+
     .action-button {
       background-color: #0051c3;
       color: white;
@@ -224,15 +269,19 @@
       align-items: center;
       gap: 8px;
     }
+
     .action-button:hover {
       background-color: #003da1;
     }
+
     .action-button.green {
       background-color: #28a745;
     }
+
     .action-button.green:hover {
       background-color: #218838;
     }
+
     /* WiFi資訊表格樣式 */
     .wifi-info-table {
       width: 100%;
@@ -242,16 +291,20 @@
       border-radius: 8px;
       overflow: hidden;
     }
+
     .wifi-info-table tr:nth-child(even) {
       background-color: #f0f0f0;
     }
+
     .wifi-info-table tr:hover {
       background-color: #e6f3ff;
     }
+
     .wifi-info-table td {
       padding: 10px;
       border-bottom: 1px solid #ddd;
     }
+
     .wifi-info-table td:first-child {
       font-weight: bold;
       width: 30%;
@@ -259,6 +312,7 @@
     }
   </style>
 </head>
+
 <body>
   <h1>蓋斯克網路速度測試</h1>
   <div id="controls"></div>
@@ -271,7 +325,7 @@
       <div id="downloadProgressText" class="progress-text">等待中...</div>
       <div id="downloadResult" class="test-result"></div>
     </div>
-    
+
     <div class="test-item">
       <div class="test-label">上傳速度測試</div>
       <div class="progress-bar">
@@ -280,7 +334,7 @@
       <div id="uploadProgressText" class="progress-text">等待中...</div>
       <div id="uploadResult" class="test-result"></div>
     </div>
-    
+
     <div class="test-item">
       <div class="test-label">抖動測試</div>
       <div class="progress-bar">
@@ -289,7 +343,7 @@
       <div id="jitterProgressText" class="progress-text">等待中...</div>
       <div id="jitterResult" class="test-result"></div>
     </div>
-    
+
     <div class="test-item">
       <div class="test-label">遺失封包測試</div>
       <div class="progress-bar">
@@ -298,7 +352,7 @@
       <div id="packetLossProgressText" class="progress-text">等待中...</div>
       <div id="packetLossResult" class="test-result"></div>
     </div>
-    
+
     <div id="statusContainer">正在準備測試...</div>
   </div>
   <div id="result">
@@ -325,32 +379,32 @@
     const progressBar = document.getElementById('progressBar');
     const progressText = document.getElementById('progressText');
     const statusContainer = document.getElementById('statusContainer');
-    
+
     // 獲取各個測試項目的進度條元素
     const downloadProgressBar = document.getElementById('downloadProgressBar');
     const uploadProgressBar = document.getElementById('uploadProgressBar');
     const jitterProgressBar = document.getElementById('jitterProgressBar');
     const packetLossProgressBar = document.getElementById('packetLossProgressBar');
-    
+
     // 獲取各個測試項目的進度文本元素
     const downloadProgressText = document.getElementById('downloadProgressText');
     const uploadProgressText = document.getElementById('uploadProgressText');
     const jitterProgressText = document.getElementById('jitterProgressText');
     const packetLossProgressText = document.getElementById('packetLossProgressText');
-    
+
     // 獲取各個測試項目的結果元素
     const downloadResult = document.getElementById('downloadResult');
     const uploadResult = document.getElementById('uploadResult');
     const jitterResult = document.getElementById('jitterResult');
     const packetLossResult = document.getElementById('packetLossResult');
-    
+
     let testProgress = 0;
     let testStages = ['下載速度測試', '上傳速度測試', '抖動測試', '遺失封包測試'];
     let currentStage = 0;
     let results = {};
     let engine = null;
     let testIntervals = [];
-    
+
     // 初始化測試引擎
     function initSpeedTest() {
       // 如果已有實例，先取消所有監聽
@@ -361,44 +415,44 @@
           console.error('停止測試時出錯:', e);
         }
       }
-      
+
       // 清除所有進行中的計時器
       testIntervals.forEach(interval => clearInterval(interval));
       testIntervals = [];
-      
+
       // 創建新的測試引擎
       engine = new SpeedTest({
         autoStart: false
       });
-      
+
       engine.onRunningChange = running => {
         if (running) {
           progressContainer.style.display = 'block';
           controlEl.textContent = '';
           statusContainer.textContent = '測試正在進行中...';
-          
+
           // 隱藏介紹文字
           const introText = document.getElementById('intro-text');
           if (introText) {
             introText.style.display = 'none';
           }
-          
+
           // 初始化所有進度條
           downloadProgressBar.style.width = '0%';
           uploadProgressBar.style.width = '0%';
           jitterProgressBar.style.width = '0%';
           packetLossProgressBar.style.width = '0%';
-          
+
           downloadProgressText.textContent = '等待中...';
           uploadProgressText.textContent = '等待中...';
           jitterProgressText.textContent = '等待中...';
           packetLossProgressText.textContent = '等待中...';
-          
+
           downloadResult.textContent = '';
           uploadResult.textContent = '';
           jitterResult.textContent = '';
           packetLossResult.textContent = '';
-          
+
           // 開始下載測試進度模擬
           const downloadInterval = simulateTestProgress('download');
           testIntervals.push(downloadInterval);
@@ -407,7 +461,7 @@
           setTimeout(() => {
             progressContainer.style.display = 'none';
             controlEl.textContent = '測試完成!';
-            
+
             // 顯示詳細測試報告
             if (engine && engine.results) {
               displayResults(engine.results.getSummary());
@@ -418,44 +472,44 @@
           }, 2000);
         }
       };
-      
+
       engine.onResultsChange = ({ type }) => {
         if (!engine || engine.isFinished) return;
-        
+
         console.log(type);
-        
+
         if (type === 'download') {
           results.download = engine.results.getSummary().download;
           updateTestProgress('download', 100);
           downloadResult.textContent = (results.download / 1000000).toFixed(2) + ' Mbps';
-          
+
           // 開始上傳測試進度模擬
           const uploadInterval = simulateTestProgress('upload');
           testIntervals.push(uploadInterval);
-        } 
+        }
         else if (type === 'upload') {
           results.upload = engine.results.getSummary().upload;
           updateTestProgress('upload', 100);
           uploadResult.textContent = (results.upload / 1000000).toFixed(2) + ' Mbps';
-          
+
           // 開始抖動測試
           const jitterInterval = simulateTestProgress('jitter');
           testIntervals.push(jitterInterval);
         }
         else if (type === 'latency') {
           results.latency = engine.results.getSummary().latency;
-          
+
           // 抖動結果從延遲測試中獲取
           if (engine.results.getSummary().jitter) {
             results.jitter = engine.results.getSummary().jitter;
             updateTestProgress('jitter', 100);
             jitterResult.textContent = results.jitter.toFixed(2) + ' ms';
           }
-          
+
           // 開始丟包測試
           const packetLossInterval = simulateTestProgress('packetLoss');
           testIntervals.push(packetLossInterval);
-          
+
           // 模擬丟包測試結果
           setTimeout(() => {
             if (engine && engine.results) {
@@ -466,12 +520,12 @@
           }, 3500);
         }
       };
-      
+
       engine.onFinish = results => {
         const summary = results.getSummary();
         console.log(summary);
         console.log(results.getScores());
-        
+
         // 詳細測試報告會由 onRunningChange 中的回調顯示
       };
 
@@ -480,10 +534,10 @@
         statusContainer.textContent = '測試出錯: ' + e.message;
       };
     }
-    
+
     // 初始化引擎
     initSpeedTest();
-    
+
     // 創建開始測試按鈕
     const playButton = document.createElement('button');
     playButton.textContent = "開始網路測速";
@@ -492,10 +546,10 @@
       resetTest();
     };
     controlEl.appendChild(playButton);
-    
+
     function updateTestProgress(testType, percent) {
       requestAnimationFrame(() => {
-        switch(testType) {
+        switch (testType) {
           case 'download':
             downloadProgressBar.style.width = percent + '%';
             downloadProgressText.textContent = percent + '%';
@@ -515,50 +569,50 @@
         }
       });
     }
-    
+
     function simulateTestProgress(testType) {
       let startTime = Date.now();
       let lastProgress = 0;
       let duration = 0;
-      
+
       // 為每種測試類型設置不同的持續時間
-      switch(testType) {
+      switch (testType) {
         case 'download': duration = 5000; break;
-        case 'upload': duration = 5000; break; 
+        case 'upload': duration = 5000; break;
         case 'jitter': duration = 3000; break;
         case 'packetLoss': duration = 3500; break;
       }
-      
+
       // 更新進度文本顯示為測試中
-      switch(testType) {
+      switch (testType) {
         case 'download': downloadProgressText.textContent = '測試中...'; break;
         case 'upload': uploadProgressText.textContent = '測試中...'; break;
         case 'jitter': jitterProgressText.textContent = '測試中...'; break;
         case 'packetLoss': packetLossProgressText.textContent = '測試中...'; break;
       }
-      
+
       let interval = setInterval(() => {
         let elapsed = Date.now() - startTime;
         let progress = Math.min(Math.floor((elapsed / duration) * 100), 99);
-        
+
         if (progress > lastProgress) {
           lastProgress = progress;
           updateTestProgress(testType, progress);
         }
-        
+
         if (progress >= 99) {
           clearInterval(interval);
         }
       }, 50);
-      
+
       return interval;
     }
-    
+
     // 完全重置測試的函數
     function resetTest() {
       resetProgress();
       initSpeedTest();
-      
+
       // 重置界面
       resEl.innerHTML = '';
       const introText = document.createElement('div');
@@ -566,30 +620,30 @@
       introText.style.textAlign = 'center';
       introText.style.padding = '20px';
       introText.style.color = '#666';
-      
+
       const p1 = document.createElement('p');
       p1.textContent = '本測試將依序進行：';
       introText.appendChild(p1);
-      
+
       const ol = document.createElement('ol');
       ol.style.display = 'inline-block';
       ol.style.textAlign = 'left';
-      
+
       const stages = ['下載速度測試', '上傳速度測試', '抖動測試', '遺失封包測試'];
       stages.forEach(stage => {
         const li = document.createElement('li');
         li.textContent = stage;
         ol.appendChild(li);
       });
-      
+
       introText.appendChild(ol);
-      
+
       const p2 = document.createElement('p');
       p2.textContent = '測試進行中，請稍候...';
       introText.appendChild(p2);
-      
+
       resEl.appendChild(introText);
-      
+
       // 開始新測試
       setTimeout(() => {
         if (engine) {
@@ -600,86 +654,63 @@
         }
       }, 500);
     }
-    
+
     function resetProgress() {
       testProgress = 0;
       currentStage = 0;
-      
+
       // 重置所有進度條
       downloadProgressBar.style.width = '0%';
       uploadProgressBar.style.width = '0%';
       jitterProgressBar.style.width = '0%';
       packetLossProgressBar.style.width = '0%';
-      
+
       downloadProgressText.textContent = '等待中...';
       uploadProgressText.textContent = '等待中...';
       jitterProgressText.textContent = '等待中...';
       packetLossProgressText.textContent = '等待中...';
-      
+
       downloadResult.textContent = '';
       uploadResult.textContent = '';
       jitterResult.textContent = '';
       packetLossResult.textContent = '';
-      
+
       results = {};
     }
 
     function displayResults(data) {
       resEl.innerHTML = '';
-      
+
       // 創建結果容器
       const resultContent = document.createElement('div');
-      
+
       // 添加標題
       const title = document.createElement('h2');
       title.textContent = '網路速度測試結果分析';
       resultContent.appendChild(title);
-      
-      // WiFi網路資訊部分
+
+      // WiFi網路資訊部分 - 已移除 (因無法獲取真實數據，避免誤導)
+      /* 
+      // 原有代碼已移除
       const wifiSection = document.createElement('div');
-      wifiSection.className = 'result-section';
-      
-      const wifiTitle = document.createElement('h3');
-      wifiTitle.textContent = 'WiFi網路資訊';
-      wifiSection.appendChild(wifiTitle);
-      
-      // 創建表格來顯示WiFi資訊
-      const wifiInfoTable = document.createElement('table');
-      wifiInfoTable.className = 'wifi-info-table';
-      
-      // 添加WiFi資訊項目
-      addWifiInfoRow(wifiInfoTable, '網路名稱', 'ZoneTech_5G');
-      addWifiInfoRow(wifiInfoTable, 'IP位址', '192.168.1.108');
-      addWifiInfoRow(wifiInfoTable, '路由器', '192.168.1.1');
-      addWifiInfoRow(wifiInfoTable, 'MAC位址', '3e:bf:3f:8c:fe:55');
-      addWifiInfoRow(wifiInfoTable, '安全層級', 'WPA2個人級');
-      addWifiInfoRow(wifiInfoTable, 'BSSID', 'f4:92:bf:a5:ef:3a');
-      addWifiInfoRow(wifiInfoTable, '頻道', '40 (5 吉赫, 80 兆赫)');
-      addWifiInfoRow(wifiInfoTable, '國碼', 'TW');
-      addWifiInfoRow(wifiInfoTable, 'RSSI', '-53 dBm');
-      addWifiInfoRow(wifiInfoTable, '雜訊', '-95 dBm');
-      addWifiInfoRow(wifiInfoTable, '傳送速率', '600 Mbps');
-      addWifiInfoRow(wifiInfoTable, 'PHY模式', '802.11ax');
-      addWifiInfoRow(wifiInfoTable, 'MCS索引', '11');
-      addWifiInfoRow(wifiInfoTable, 'NSS', '1');
-      
-      wifiSection.appendChild(wifiInfoTable);
-      resultContent.appendChild(wifiSection);
-      
+      ...
+      */
+
       // 基本網路參數部分
       const basicSection = document.createElement('div');
       basicSection.className = 'result-section';
-      
+
       const basicTitle = document.createElement('h3');
       basicTitle.textContent = '基本網路參數';
       basicSection.appendChild(basicTitle);
-      
+
       // 下載速度
-      const downloadMbps = (data.download / 1000000).toFixed(2);
+      const dlVal = data.download || 0;
+      const downloadMbps = (dlVal / 1000000).toFixed(2);
       const downloadMBps = (downloadMbps / 8).toFixed(2);
       addMetric(basicSection, '下載速度', `${downloadMbps} Mbps (${downloadMBps} MB/s)`, getRatingClass(downloadMbps, 50, 100));
       addDetail(basicSection, `這相當於每秒約 ${downloadMBps} MB 的下載速度`);
-      
+
       if (downloadMbps > 100) {
         addDetail(basicSection, '非常適合高清視頻流、大文件下載和多設備同時使用');
       } else if (downloadMbps > 25) {
@@ -687,13 +718,14 @@
       } else {
         addDetail(basicSection, '足夠基本的網頁瀏覽，但高清視頻流可能會有困難');
       }
-      
+
       // 上傳速度
-      const uploadMbps = (data.upload / 1000000).toFixed(2);
+      const ulVal = data.upload || 0;
+      const uploadMbps = (ulVal / 1000000).toFixed(2);
       const uploadMBps = (uploadMbps / 8).toFixed(2);
       addMetric(basicSection, '上傳速度', `${uploadMbps} Mbps (${uploadMBps} MB/s)`, getRatingClass(uploadMbps, 30, 50));
       addDetail(basicSection, `相當於每秒約 ${uploadMBps} MB 的上傳速度`);
-      
+
       if (uploadMbps > 50) {
         addDetail(basicSection, '非常適合視頻會議、快速文件上傳和雲備份');
       } else if (uploadMbps > 30) {
@@ -701,22 +733,23 @@
       } else {
         addDetail(basicSection, '可以進行基本的上傳任務，但大文件上傳可能較慢');
       }
-      
+
       resultContent.appendChild(basicSection);
-      
+
       // 網路質量參數部分
       const qualitySection = document.createElement('div');
       qualitySection.className = 'result-section';
-      
+
       const qualityTitle = document.createElement('h3');
       qualityTitle.textContent = '網路質量參數';
       qualitySection.appendChild(qualityTitle);
-      
+
       // 延遲（基礎）
-      const latency = data.latency.toFixed(2);
+      const latVal = data.latency || 0;
+      const latency = latVal.toFixed(2);
       addMetric(qualitySection, '延遲（基礎）', `${latency} 毫秒`, getRatingClass(50 - latency, 0, 30));
       addDetail(qualitySection, '這是網路請求的往返時間');
-      
+
       if (latency < 20) {
         addDetail(qualitySection, '極佳的延遲，適合競技遊戲和實時應用');
       } else if (latency < 50) {
@@ -724,12 +757,13 @@
       } else {
         addDetail(qualitySection, '可能會在視頻通話和在線遊戲中感到一些延遲');
       }
-      
+
       // 抖動（基礎）
-      const jitter = data.jitter.toFixed(2);
+      const jitVal = data.jitter || 0;
+      const jitter = jitVal.toFixed(2);
       addMetric(qualitySection, '抖動（基礎）', `${jitter} 毫秒`, getRatingClass(30 - jitter, 0, 20));
       addDetail(qualitySection, '表示延遲變化的程度');
-      
+
       if (jitter < 5) {
         addDetail(qualitySection, '極低的抖動，網路非常穩定');
       } else if (jitter < 30) {
@@ -737,7 +771,7 @@
       } else {
         addDetail(qualitySection, '較高的抖動可能導致視頻通話和遊戲出現卡頓');
       }
-      
+
       // 下載時延遲
       if (data.downLoadedLatency) {
         const dlLatency = data.downLoadedLatency.toFixed(2);
@@ -745,14 +779,14 @@
         addDetail(qualitySection, '在進行下載時測量的延遲');
         addDetail(qualitySection, '在下載過程中延遲有所增加，這是正常現象');
       }
-      
+
       // 下載時抖動
       if (data.downLoadedJitter) {
         const dlJitter = data.downLoadedJitter.toFixed(2);
         addMetric(qualitySection, '下載時抖動', `${dlJitter} 毫秒`, getRatingClass(30 - dlJitter, 0, 20));
         addDetail(qualitySection, `下載過程中的抖動${dlJitter < jitter ? '降低' : '增加'}了`);
       }
-      
+
       // 上傳時延遲
       if (data.upLoadedLatency) {
         const ulLatency = data.upLoadedLatency.toFixed(2);
@@ -760,7 +794,7 @@
         addDetail(qualitySection, '上傳過程中測量的延遲');
         addDetail(qualitySection, '比基礎延遲高，因為上傳會佔用更多頻寬');
       }
-      
+
       // 上傳時抖動
       if (data.upLoadedJitter) {
         const ulJitter = data.upLoadedJitter.toFixed(2);
@@ -772,12 +806,12 @@
           addDetail(qualitySection, '上傳過程中的抖動在可接受範圍內');
         }
       }
-      
+
       // 丟包率
       if (data.packetLoss !== undefined) {
         const packetLoss = data.packetLoss.toFixed(2);
         addMetric(qualitySection, '丟包率', `${packetLoss}%`, packetLoss === 0 ? 'good' : (packetLoss < 2 ? 'warning' : 'poor'));
-        
+
         if (packetLoss === 0) {
           addDetail(qualitySection, '完美的丟包率，表示數據傳輸非常可靠');
         } else if (packetLoss < 2) {
@@ -786,68 +820,127 @@
           addDetail(qualitySection, '丟包率較高，可能會影響視頻通話和遊戲體驗');
         }
       }
-      
+
       resultContent.appendChild(qualitySection);
-      
+
       // 總體評價
       const overallSection = document.createElement('div');
       overallSection.className = 'result-section';
-      
+
       const overallTitle = document.createElement('h3');
       overallTitle.textContent = '總體評價';
       overallSection.appendChild(overallTitle);
-      
+
       // 計算總體評分
       let overallScore = 0;
-      
-      // 下載速度評分 (0-5分)
-      let downloadScore = Math.min(5, downloadMbps / 20);
-      
-      // 上傳速度評分 (0-5分)
-      // 30Mbps得1.25分，50Mbps得5分，線性計算
-      let uploadScore = uploadMbps <= 30 ? Math.min(1.25, uploadMbps / 24) : Math.min(5, 1.25 + (uploadMbps - 30) * 3.75 / 20);
-      
-      // 延遲評分 (0-5分)
-      let latencyScore = Math.min(5, Math.max(0, 6 - (latency / 20)));
-      
-      // 抖動評分 (0-5分)
-      let jitterScore = Math.min(5, Math.max(0, 5 - (jitter / 10)));
-      
-      // 丟包評分 (0-5分)
-      let packetLossScore = data.packetLoss === 0 ? 5 : Math.max(0, 5 - data.packetLoss * 2.5);
-      
-      // 計算加權總分 (滿分100)
-      overallScore = (downloadScore * 35 + uploadScore * 20 + latencyScore * 20 + jitterScore * 15 + packetLossScore * 10) / 5;
-      
+
+      // 確保將字串轉換為數字
+      const dlMbps = parseFloat(downloadMbps) || 0;
+      const ulMbps = parseFloat(uploadMbps) || 0;
+      const lat = parseFloat(latency) || 0;
+      const jit = typeof jitter !== 'undefined' ? (parseFloat(jitter) || 0) : 0;
+      const pl = (data.packetLoss !== undefined) ? data.packetLoss : 0;
+
+      // 獲取負載時的指標
+      const dlLat = data.downLoadedLatency ? parseFloat(data.downLoadedLatency.toFixed(2)) : 0;
+      const dlJit = data.downLoadedJitter ? parseFloat(data.downLoadedJitter.toFixed(2)) : 0;
+      const ulLat = data.upLoadedLatency ? parseFloat(data.upLoadedLatency.toFixed(2)) : 0;
+      const ulJit = data.upLoadedJitter ? parseFloat(data.upLoadedJitter.toFixed(2)) : 0;
+
+      // === 嚴格評分系統 (短板效應封頂機制) ===
+
+      // 定義閾值 (參考業界標準)
+      let isPoor = false;
+      let isAverage = false;
+      let poorReasons = [];
+
+      // 檢查是否為「較差」 (Poor) - 此標準下，總分上限為 59
+      if (lat > 100) { isPoor = true; poorReasons.push('基礎延遲過高'); }
+      if (jit > 50) { isPoor = true; poorReasons.push('基礎抖動過高'); }
+      if (dlLat > 200) { isPoor = true; poorReasons.push('下載延遲嚴重'); } // 負載時放寬一些
+      if (dlJit > 50) { isPoor = true; poorReasons.push('下載抖動嚴重'); }
+      if (ulLat > 200) { isPoor = true; poorReasons.push('上傳延遲嚴重'); }
+      if (ulJit > 50) { isPoor = true; poorReasons.push('上傳抖動嚴重'); }
+      if (pl > 2) { isPoor = true; poorReasons.push('丟包嚴重'); }
+
+      // 檢查是否為「普通」 (Average) - 此標準下，總分上限為 79
+      if (!isPoor) {
+        if (lat > 50) isAverage = true;
+        if (jit > 30) isAverage = true;
+        if (dlLat > 60) isAverage = true;
+        if (dlJit > 30) isAverage = true;
+        if (ulLat > 60) isAverage = true;
+        if (ulJit > 30) isAverage = true;
+        if (pl > 0.5) isAverage = true;
+      }
+
+      // 原始分數計算
+      let downloadScore = Math.min(5, dlMbps / 20);
+      let uploadScore = 0;
+      if (ulMbps <= 30) {
+        uploadScore = Math.min(1.25, ulMbps / 24);
+      } else {
+        uploadScore = Math.min(5, 1.25 + (ulMbps - 30) * 3.75 / 20);
+      }
+      let latencyScore = Math.min(5, Math.max(0, 6 - (lat / 20)));
+      let jitterScore = Math.min(5, Math.max(0, 5 - (jit / 10)));
+      let packetLossScore = pl === 0 ? 5 : Math.max(0, 5 - pl * 2.5);
+
+      // 加權總分
+      let rawScore = (downloadScore * 35 + uploadScore * 20 + latencyScore * 20 + jitterScore * 15 + packetLossScore * 10) / 5;
+      if (isNaN(rawScore)) rawScore = 0;
+
+      // === 應用封頂規則 ===
+      if (isPoor) {
+        // 紅燈規則: 強制封頂 59 (較差)
+        overallScore = Math.min(rawScore, 59);
+        console.log('觸發紅燈規則 (Poor)，分數限制為 59。原因:', poorReasons);
+      } else if (isAverage) {
+        // 黃燈規則: 強制封頂 79 (普通)
+        overallScore = Math.min(rawScore, 79);
+        console.log('觸發黃燈規則 (Average)，分數限制為 79');
+      } else {
+        overallScore = rawScore;
+      }
+
       let overallRating = '';
       let overallClass = '';
-      
+
+      // 調整後的評級區間
       if (overallScore >= 90) {
         overallRating = '極佳';
-        overallClass = 'good';
-      } else if (overallScore >= 70) {
+        overallClass = 'good'; // 深綠/藍
+      } else if (overallScore >= 80) {
         overallRating = '良好';
         overallClass = 'good';
       } else if (overallScore >= 60) {
-        overallRating = '一般';
-        overallClass = 'warning';
+        overallRating = '普通'; // 60-79 為普通
+        overallClass = 'warning'; // 黃色
       } else {
         overallRating = '較差';
-        overallClass = 'poor';
+        overallClass = 'poor'; // 紅色
       }
-      
+
       const overallDiv = document.createElement('div');
       overallDiv.className = 'overall-rating';
       overallDiv.innerHTML = `您的網路質量總體評價: <span class="${overallClass}">${overallRating}</span> (${Math.round(overallScore)}/100)`;
       overallSection.appendChild(overallDiv);
-      
+
       // 總體評價文字
       const overallText = document.createElement('p');
-      overallText.textContent = '您的網路連接整體表現' + (overallScore >= 70 ? '良好' : (overallScore >= 60 ? '一般' : '較弱')) + '：';
+      if (isPoor) {
+        overallText.textContent = '您的網路在某些關鍵指標（如抖動或延遲）表現較差，這會顯著影響即時應用體驗。';
+      } else if (isAverage) {
+        overallText.textContent = '您的網路表現普通，大部分應用可正常使用，但高互動需求應用可能偶有延遲。';
+      } else {
+        overallText.textContent = '您的網路連接整體表現' + overallRating + '，';
+        if (overallScore >= 90) overallText.textContent += '非常適合各類高強度網路應用。';
+        else overallText.textContent += '足以應付絕大多數日常需求。';
+      }
       overallSection.appendChild(overallText);
-      
+
       const overallList = document.createElement('ul');
-      
+
       if (downloadMbps > 100) {
         addListItem(overallList, '下載速度非常快，適合幾乎所有網路活動');
       } else if (downloadMbps > 25) {
@@ -855,7 +948,7 @@
       } else {
         addListItem(overallList, '下載速度一般，基本網路活動可能較慢');
       }
-      
+
       if (uploadMbps > 50) {
         addListItem(overallList, '上傳速度優秀，適合視頻會議和大文件上傳');
       } else if (uploadMbps > 30) {
@@ -863,7 +956,7 @@
       } else {
         addListItem(overallList, '上傳速度較慢，可能不適合視頻會議或頻繁上傳');
       }
-      
+
       if (latency < 30) {
         addListItem(overallList, '延遲很低，適合實時在線遊戲和視頻通話');
       } else if (latency < 70) {
@@ -871,15 +964,18 @@
       } else {
         addListItem(overallList, '延遲較高，可能會影響實時應用體驗');
       }
-      
+
       if (data.upLoadedJitter > 50) {
         addListItem(overallList, '上傳時的高抖動可能會在視頻通話或在線遊戲中偶爾造成卡頓');
       }
-      
+
       overallSection.appendChild(overallList);
-      
+
       const conclusion = document.createElement('p');
-      if (overallScore >= 70) {
+      if (isPoor) {
+        conclusion.textContent = '建議檢查網路設備與環境，改善不穩定因素。';
+        conclusion.style.color = '#d9534f';
+      } else if (overallScore >= 70) {
         conclusion.textContent = '這個連接非常適合家庭或小型辦公室使用，能夠滿足多人同時使用的需求。';
         if (latency > 50 || data.upLoadedJitter > 70) {
           conclusion.textContent += '如果您需要進行對延遲敏感的活動（如競技遊戲），可能需要考慮提升網路穩定性。';
@@ -890,42 +986,42 @@
         conclusion.textContent = '這個連接可能不適合高強度的網路活動，建議聯繫您的網路服務提供商了解升級選項。';
       }
       overallSection.appendChild(conclusion);
-      
+
       resultContent.appendChild(overallSection);
-      
+
       // 創建按鈕容器
       const actionButtons = document.createElement('div');
       actionButtons.className = 'action-buttons';
-      
+
       // 創建保存圖片按鈕
       const saveButton = document.createElement('button');
       saveButton.className = 'action-button';
       saveButton.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19 21H5C3.89543 21 3 20.1046 3 19V5C3 3.89543 3.89543 3 5 3H14.5858C14.851 3 15.1054 3.10536 15.2929 3.29289L20.7071 8.70711C20.8946 8.89464 21 9.149 21 9.41421V19C21 20.1046 20.1046 21 19 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.6 9H15.4C15.7314 9 16 8.73137 16 8.4V3.6C16 3.26863 15.7314 3 15.4 3H8.6C8.26863 3 8 3.26863 8 3.6V8.4C8 8.73137 8.26863 9 8.6 9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 21V15C8 13.8954 8.89543 13 10 13H14C15.1046 13 16 13.8954 16 15V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> 儲存圖片';
       saveButton.onclick = saveAsImage;
       actionButtons.appendChild(saveButton);
-      
+
       // 創建再次測試按鈕
       const retestButton = document.createElement('button');
       retestButton.className = 'action-button green';
       retestButton.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17.6569 16.6569C16.7202 17.5935 15.4891 18.2475 14.1435 18.5241C12.7979 18.8007 11.403 18.6863 10.1329 18.1938C8.86271 17.7013 7.76536 16.8501 6.97747 15.7442C6.18959 14.6383 5.74673 13.3282 5.69992 11.9793C5.65312 10.6304 6.00422 9.29499 6.71103 8.14207C7.41783 6.98915 8.4553 6.06865 9.69966 5.50427C10.944 4.93989 12.3401 4.75236 13.7172 4.96472C15.0943 5.17707 16.3841 5.78078 17.4262 6.69705L20 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 3V9H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> 再測試一次';
-      retestButton.onclick = resetTest;
+      retestButton.onclick = function () { window.location.reload(); };
       actionButtons.appendChild(retestButton);
-      
+
       resultContent.appendChild(actionButtons);
-      
+
       resEl.appendChild(resultContent);
     }
-    
+
     // 保存測試結果為圖片的函數
     function saveAsImage() {
       const resultEl = document.getElementById('result');
       const saveButton = document.querySelector('.action-button');
-      
+
       // 暫時隱藏按鈕以避免其出現在截圖中
       const actionButtons = document.querySelector('.action-buttons');
       const originalDisplay = actionButtons.style.display;
       actionButtons.style.display = 'none';
-      
+
       // 顯示正在處理的提示
       const processingMsg = document.createElement('div');
       processingMsg.textContent = '正在生成圖片...';
@@ -933,7 +1029,7 @@
       processingMsg.style.margin = '20px 0';
       processingMsg.style.fontWeight = 'bold';
       resultEl.appendChild(processingMsg);
-      
+
       // 生成圖片
       html2canvas(resultEl, {
         backgroundColor: '#f8f9fa',
@@ -943,7 +1039,7 @@
           // 在克隆的文檔中也隱藏按鈕
           const clonedButtons = clonedDoc.querySelector('.action-buttons');
           if (clonedButtons) clonedButtons.style.display = 'none';
-          
+
           // 刪除克隆文檔中的處理信息
           const clonedMsg = clonedDoc.querySelector('#result > div:last-child');
           if (clonedMsg && clonedMsg.textContent === '正在生成圖片...') {
@@ -953,56 +1049,64 @@
       }).then(canvas => {
         // 移除處理提示
         processingMsg.remove();
-        
+
         // 顯示按鈕
         actionButtons.style.display = originalDisplay;
-        
+
+        // 獲取當前日期
+        const now = new Date();
+        const dateStr = now.toISOString().split('T')[0];
+        const timestamp = now.toLocaleTimeString('en-GB', { hour12: false }).replace(/:/g, '-');
+
+        // 使用更通用的檔名，避免使用錯誤的網路名稱
+        const filename = `SpeedTest_Result_${dateStr}_${timestamp}.jpg`;
+
         // 轉換為圖片並下載
         const link = document.createElement('a');
-        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-        link.download = `網路速度測試結果_${timestamp}.jpg`;
-        link.href = canvas.toDataURL('image/jpeg', 0.8);
+        link.download = filename;
+        // 指定使用 jpeg 格式，品質 0.9
+        link.href = canvas.toDataURL('image/jpeg', 0.9);
         link.click();
       }).catch(err => {
         console.error('生成圖片時出錯：', err);
-        
+
         // 移除處理提示
         processingMsg.remove();
-        
+
         // 顯示按鈕
         actionButtons.style.display = originalDisplay;
-        
+
         // 顯示錯誤信息
         const errorMsg = document.createElement('div');
         errorMsg.textContent = '無法生成圖片，請稍後再試。';
         errorMsg.style.color = 'red';
         errorMsg.style.textAlign = 'center';
         errorMsg.style.margin = '20px 0';
-        
+
         // 5秒後移除錯誤信息
         setTimeout(() => errorMsg.remove(), 5000);
-        
+
         resultEl.appendChild(errorMsg);
       });
     }
-    
+
     function addMetric(container, name, value, ratingClass) {
       const metric = document.createElement('div');
       metric.className = 'metric';
-      
+
       const metricName = document.createElement('div');
       metricName.className = 'metric-name';
       metricName.textContent = name;
-      
+
       const metricValue = document.createElement('div');
       metricValue.className = 'metric-value ' + ratingClass;
       metricValue.textContent = value;
-      
+
       metric.appendChild(metricName);
       metric.appendChild(metricValue);
       container.appendChild(metric);
     }
-    
+
     function addDetail(container, text) {
       const detail = document.createElement('div');
       detail.className = 'detail';
@@ -1012,34 +1116,35 @@
       detail.style.color = '#666';
       container.appendChild(detail);
     }
-    
+
     function addListItem(list, text) {
       const item = document.createElement('li');
       item.textContent = text;
       list.appendChild(item);
     }
-    
+
     function getRatingClass(value, warningThreshold, goodThreshold) {
       if (value <= 0) return 'poor';
       if (value < warningThreshold) return 'poor';
       if (value < goodThreshold) return 'warning';
       return 'good';
     }
-    
+
     // 添加WiFi資訊表格行的函數
     function addWifiInfoRow(table, label, value) {
       const row = document.createElement('tr');
-      
+
       const labelCell = document.createElement('td');
       labelCell.textContent = label;
-      
+
       const valueCell = document.createElement('td');
       valueCell.textContent = value;
-      
+
       row.appendChild(labelCell);
       row.appendChild(valueCell);
       table.appendChild(row);
     }
   </script>
 </body>
+
 </html>
