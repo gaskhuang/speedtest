@@ -4,1145 +4,863 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>網路速度測試</title>
+  <title>蓋斯克網路測速 · 專業診斷</title>
+  <meta name="description" content="蓋斯克科技專業級網路測速工具，測量下載、上傳、延遲、抖動、丟包與 Bufferbloat，並比對台灣與全球平均值，找出您的網路瓶頸。">
   <style>
+    :root {
+      --bg: #070b16;
+      --bg-2: #0c1324;
+      --surface: rgba(255, 255, 255, 0.04);
+      --surface-2: rgba(255, 255, 255, 0.06);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(255, 255, 255, 0.14);
+      --text: #eaf0ff;
+      --muted: #93a1c0;
+      --muted-2: #6b7899;
+      --brand: #3b82f6;
+      --brand-2: #06d6d6;
+      --accent: #8b5cf6;
+      --good: #22c55e;
+      --warn: #f59e0b;
+      --poor: #ef4444;
+      --shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-      font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
-      color: #333;
+      font-family: 'PingFang TC', 'Microsoft JhengHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: var(--text);
       line-height: 1.6;
-      background-color: #f8f9fa;
+      background:
+        radial-gradient(1200px 600px at 15% -5%, rgba(59, 130, 246, 0.18), transparent 60%),
+        radial-gradient(1000px 600px at 110% 10%, rgba(139, 92, 246, 0.16), transparent 55%),
+        radial-gradient(900px 700px at 50% 120%, rgba(6, 214, 214, 0.10), transparent 60%),
+        var(--bg);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
     }
 
-    h1 {
-      color: #0051c3;
-      text-align: center;
-      margin-bottom: 30px;
-      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    .wrap { max-width: 960px; margin: 0 auto; padding: 28px 20px 80px; }
+
+    /* ---------- Top bar ---------- */
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 34px;
+    }
+    .brand { display: flex; align-items: center; gap: 14px; }
+    .brand-logo { height: 52px; width: auto; display: block; }
+    .brand-sub { font-size: 17px; color: var(--muted); font-weight: 500;
+      padding-left: 14px; border-left: 1px solid var(--border-strong); }
+    .badge-pill {
+      font-size: 17px; color: var(--muted); border: 1px solid var(--border);
+      background: var(--surface); padding: 6px 12px; border-radius: 999px;
+      display: flex; align-items: center; gap: 7px;
+    }
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--good); box-shadow: 0 0 10px var(--good); }
+
+    /* ---------- Hero ---------- */
+    .hero { text-align: center; margin-bottom: 26px; }
+    .hero h1 {
+      font-size: clamp(34px, 6vw, 54px); font-weight: 850; letter-spacing: -.5px;
+      background: linear-gradient(120deg, #fff 20%, #a9c2ff 55%, #7ff0f0 100%);
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+      line-height: 1.2;
+    }
+    .hero p { color: var(--muted); margin-top: 10px; font-size: 20px; }
+
+    /* ---------- Gauge card ---------- */
+    .stage {
+      background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+      border: 1px solid var(--border); border-radius: 26px;
+      padding: 30px 24px 26px; box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+    .gauge-wrap { display: flex; flex-direction: column; align-items: center; }
+    .gauge { position: relative; width: 300px; max-width: 78vw; }
+    .gauge svg { width: 100%; height: auto; display: block; overflow: visible; }
+    .gauge-center {
+      position: absolute; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; pointer-events: none;
+    }
+    .gauge-phase {
+      font-size: 18px; letter-spacing: 2px; color: var(--brand-2);
+      text-transform: uppercase; font-weight: 700; min-height: 18px;
+    }
+    .gauge-value { font-size: 62px; font-weight: 850; line-height: 1; margin-top: 4px;
+      font-variant-numeric: tabular-nums; text-shadow: 0 4px 30px rgba(59,130,246,.35); }
+    .gauge-unit { font-size: 20px; color: var(--muted); font-weight: 600; margin-top: 6px; }
+
+    /* live chips under gauge */
+    .live-chips {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+      width: 100%; max-width: 560px; margin: 22px auto 0;
+    }
+    .chip {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 12px 8px; text-align: center;
+      transition: border-color .3s, transform .3s;
+    }
+    .chip.active { border-color: rgba(59,130,246,.55); transform: translateY(-2px); box-shadow: 0 8px 22px rgba(59,130,246,.18); }
+    .chip .k { font-size: 16px; color: var(--muted-2); font-weight: 600; }
+    .chip .v { font-size: 22px; font-weight: 800; margin-top: 3px; font-variant-numeric: tabular-nums; }
+    .chip .u { font-size: 15px; color: var(--muted-2); }
+
+    /* ---------- Buttons ---------- */
+    .actions { display: flex; justify-content: center; gap: 14px; margin-top: 26px; flex-wrap: wrap; }
+    .btn {
+      appearance: none; border: none; cursor: pointer; font-family: inherit;
+      font-size: 21px; font-weight: 700; color: #fff; padding: 14px 30px;
+      border-radius: 14px; display: inline-flex; align-items: center; gap: 9px;
+      transition: transform .18s, box-shadow .18s, opacity .2s;
+    }
+    .btn:active { transform: scale(.97); }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      box-shadow: 0 12px 34px rgba(59, 130, 246, 0.42);
+    }
+    .btn-primary:hover { box-shadow: 0 16px 44px rgba(59, 130, 246, 0.6); transform: translateY(-2px); }
+    .btn-primary:disabled { opacity: .55; cursor: not-allowed; box-shadow: none; transform: none; }
+    .btn-ghost { background: var(--surface-2); border: 1px solid var(--border-strong); color: var(--text); }
+    .btn-ghost:hover { background: rgba(255,255,255,0.1); }
+    .btn svg { width: 24px; height: 24px; }
+
+    /* ---------- Results ---------- */
+    #results { margin-top: 26px; display: none; }
+    .section { margin-top: 22px; }
+    .section-title {
+      font-size: 18px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 14px; display: flex; align-items: center; gap: 10px;
+    }
+    .section-title::before { content: ""; width: 4px; height: 15px; border-radius: 3px;
+      background: linear-gradient(var(--brand), var(--brand-2)); }
+
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 20px;
     }
 
-    #controls {
-      text-align: center;
-      margin-bottom: 30px;
+    /* Verdict header */
+    .verdict {
+      display: flex; align-items: center; gap: 22px; flex-wrap: wrap;
+      background: linear-gradient(135deg, rgba(59,130,246,.10), rgba(139,92,246,.08));
+      border: 1px solid var(--border-strong);
     }
-
-    #progressContainer {
-      display: none;
-      margin: 20px 0;
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    .score-ring { position: relative; width: 126px; height: 126px; flex-shrink: 0; }
+    .score-ring svg { transform: rotate(-90deg); }
+    .score-ring .num {
+      position: absolute; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
     }
+    .score-ring .num b { font-size: 44px; font-weight: 850; line-height: 1; }
+    .score-ring .num span { font-size: 16px; color: var(--muted); }
+    .verdict-body { flex: 1; min-width: 240px; }
+    .verdict-rating { font-size: 28px; font-weight: 850; }
+    .verdict-head { font-size: 20px; color: var(--text); margin-top: 8px; }
+    .verdict-head b { color: #fff; }
+    .verdict-sub { font-size: 18px; color: var(--muted); margin-top: 6px; }
 
-    .progress-bar {
-      width: 100%;
-      height: 20px;
-      background-color: #f0f0f0;
-      border-radius: 10px;
-      overflow: hidden;
-      margin-bottom: 5px;
-    }
-
-    .progress {
-      height: 100%;
-      background-color: #0051c3;
-      width: 0%;
-      transition: width 0.3s ease-in-out;
-    }
-
-    #progressText {
-      text-align: center;
-      margin-top: 10px;
-      font-weight: bold;
-    }
-
-    button {
-      background-color: #0051c3;
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      font-size: 16px;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-
-    button:hover {
-      background-color: #003da1;
-    }
-
-    #result {
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    }
-
-    .result-section {
-      margin-bottom: 25px;
-    }
-
-    .result-section h3 {
-      color: #0051c3;
-      border-bottom: 1px solid #ddd;
-      padding-bottom: 8px;
-      margin-bottom: 15px;
-    }
-
+    /* metric grid */
+    .metric-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
     .metric {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 10px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 15px;
+      padding: 16px; position: relative; overflow: hidden;
     }
-
-    .metric-name {
-      font-weight: bold;
+    .metric .top { display: flex; justify-content: space-between; align-items: baseline; }
+    .metric .label { font-size: 18px; color: var(--muted); font-weight: 600; }
+    .metric .pill {
+      font-size: 16px; font-weight: 700; padding: 3px 9px; border-radius: 999px;
     }
+    .metric .big { font-size: 34px; font-weight: 850; margin-top: 8px; font-variant-numeric: tabular-nums; }
+    .metric .big small { font-size: 19px; color: var(--muted); font-weight: 600; }
+    .metric .note { font-size: 17px; color: var(--muted-2); margin-top: 4px; }
 
-    .good {
-      color: #28a745;
+    .pill-good { background: rgba(34,197,94,.16); color: #4ade80; }
+    .pill-warn { background: rgba(245,158,11,.16); color: #fbbf24; }
+    .pill-poor { background: rgba(239,68,68,.16); color: #f87171; }
+    .t-good { color: var(--good); } .t-warn { color: var(--warn); } .t-poor { color: var(--poor); }
+
+    /* benchmark bars */
+    .bench-row { margin-bottom: 20px; }
+    .bench-row:last-child { margin-bottom: 0; }
+    .bench-head { display: flex; justify-content: space-between; font-size: 18px; margin-bottom: 10px; }
+    .bench-head .name { font-weight: 700; }
+    .bench-track { display: flex; flex-direction: column; gap: 8px; }
+    .bar-line { display: grid; grid-template-columns: 110px 1fr 70px; align-items: center; gap: 10px; font-size: 17px; }
+    .bar-line .who { color: var(--muted); }
+    .bar-line .who.you { color: var(--text); font-weight: 700; }
+    .bar-box { height: 12px; background: rgba(255,255,255,.05); border-radius: 999px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 999px; transition: width 1s cubic-bezier(.2,.8,.2,1); }
+    .bar-fill.you { background: linear-gradient(90deg, var(--brand), var(--brand-2)); }
+    .bar-fill.ref { background: rgba(255,255,255,.22); }
+    .bar-line .val { text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
+    .bar-line .val.you { color: var(--text); font-weight: 700; }
+    .bench-note { font-size: 16px; color: var(--muted-2); margin-top: 14px; line-height: 1.5; }
+
+    /* bufferbloat */
+    .bloat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; text-align: center; }
+    .bloat-cell { background: var(--surface); border: 1px solid var(--border); border-radius: 13px; padding: 14px 8px; }
+    .bloat-cell .lab { font-size: 16px; color: var(--muted-2); }
+    .bloat-cell .num { font-size: 30px; font-weight: 850; margin-top: 5px; font-variant-numeric: tabular-nums; }
+    .bloat-cell .num small { font-size: 17px; color: var(--muted); }
+    .bloat-grade { text-align: center; margin-top: 16px; font-size: 19px; }
+    .grade-badge { display: inline-block; font-size: 28px; font-weight: 850; width: 40px; height: 40px;
+      line-height: 40px; border-radius: 11px; margin-right: 8px; vertical-align: middle; }
+
+    /* diagnosis */
+    .diag { display: flex; gap: 14px; padding: 16px; border-radius: 14px;
+      background: var(--surface); border: 1px solid var(--border); margin-bottom: 12px; }
+    .diag:last-child { margin-bottom: 0; }
+    .diag .ico { flex-shrink: 0; width: 38px; height: 38px; border-radius: 11px; display: grid; place-items: center; font-size: 24px; }
+    .diag.critical { border-color: rgba(239,68,68,.35); background: rgba(239,68,68,.06); }
+    .diag.critical .ico { background: rgba(239,68,68,.16); }
+    .diag.warning { border-color: rgba(245,158,11,.3); background: rgba(245,158,11,.05); }
+    .diag.warning .ico { background: rgba(245,158,11,.16); }
+    .diag.good .ico { background: rgba(34,197,94,.16); }
+    .diag .body h4 { font-size: 20px; font-weight: 800; }
+    .diag .body p { font-size: 18px; color: var(--muted); margin-top: 4px; }
+    .diag .body .fix { font-size: 18px; color: #a9c2ff; margin-top: 7px; }
+    .diag .body .fix b { color: #cdddff; }
+
+    /* use cases */
+    .uc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+    .uc {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+      padding: 15px; display: flex; align-items: center; gap: 12px;
     }
+    .uc .emoji { font-size: 30px; }
+    .uc .uc-name { font-size: 19px; font-weight: 700; }
+    .uc .uc-status { font-size: 17px; font-weight: 700; margin-top: 2px; }
 
-    .warning {
-      color: #ffc107;
-    }
+    /* progress list (during test) */
+    #phaseList { margin-top: 22px; display: none; }
+    .plist { display: grid; gap: 10px; }
+    .prow { display: grid; grid-template-columns: 20px 1fr auto; align-items: center; gap: 12px;
+      font-size: 19px; padding: 6px 0; }
+    .prow .st { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border-strong); position: relative; }
+    .prow.doing .st { border-color: var(--brand); }
+    .prow.doing .st::after { content: ""; position: absolute; inset: 2px; border-radius: 50%;
+      border: 2px solid transparent; border-top-color: var(--brand); animation: spin .8s linear infinite; }
+    .prow.done .st { border-color: var(--good); background: var(--good); }
+    .prow.done .st::after { content: "✓"; position: absolute; inset: -3px; color: #04140a; font-size: 17px;
+      font-weight: 900; display: grid; place-items: center; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .prow .pname { color: var(--muted); }
+    .prow.doing .pname, .prow.done .pname { color: var(--text); }
+    .prow .pval { color: var(--brand-2); font-weight: 700; font-variant-numeric: tabular-nums; }
 
-    .poor {
-      color: #dc3545;
-    }
+    .disclaimer { text-align: center; font-size: 17px; color: var(--muted-2); margin-top: 30px; line-height: 1.6; }
+    .foot { text-align: center; margin-top: 26px; color: var(--muted-2); font-size: 17px; }
+    .foot a { color: var(--muted); text-decoration: none; }
 
-    .overall-rating {
-      text-align: center;
-      font-size: 18px;
-      margin: 20px 0;
-      font-weight: bold;
-    }
-
-    #statusContainer {
-      text-align: center;
-      margin-top: 15px;
-      font-weight: bold;
-    }
-
-    .result-item {
-      padding: 15px;
-      margin: 10px 0;
-      background-color: #f8f9fa;
-      border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-      border-left: 4px solid #0051c3;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .result-item:hover {
-      transform: translateX(5px);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    }
-
-    .result-item strong {
-      color: #0051c3;
-      display: block;
-      margin-bottom: 5px;
-      font-size: 16px;
-    }
-
-    .test-info {
-      text-align: center;
-      padding: 15px;
-      margin: 10px 0;
-      background-color: #e6f3ff;
-      border-radius: 8px;
-      border-left: 4px solid #0051c3;
-      color: #0051c3;
-      font-weight: bold;
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0% {
-        opacity: 0.7;
-      }
-
-      50% {
-        opacity: 1;
-      }
-
-      100% {
-        opacity: 0.7;
-      }
-    }
-
-    .recommendation {
-      background-color: #f0f7ff;
-      padding: 15px;
-      border-radius: 8px;
-      margin-top: 20px;
-      border-left: 4px solid #28a745;
-    }
-
-    .recommendation h4 {
-      color: #28a745;
-      margin-top: 0;
-    }
-
-    .score-breakdown {
-      background-color: #f8f9fa;
-      padding: 15px;
-      border-radius: 8px;
-      margin: 15px 0;
-    }
-
-    .score-item {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 8px;
-      border-bottom: 1px dashed #ddd;
-      padding-bottom: 8px;
-    }
-
-    .score-label {
-      font-weight: bold;
-    }
-
-    .total-score {
-      font-weight: bold;
-      font-size: 18px;
-      text-align: right;
-      margin-top: 10px;
-      border-top: 2px solid #ddd;
-      padding-top: 5px;
-    }
-
-    .test-item {
-      margin-bottom: 15px;
-      background-color: white;
-      padding: 15px;
-      border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-
-    .test-label {
-      font-weight: bold;
-      margin-bottom: 8px;
-      color: #0051c3;
-    }
-
-    .progress-text {
-      font-size: 14px;
-      color: #666;
-      margin-bottom: 5px;
-    }
-
-    .test-result {
-      font-weight: bold;
-      color: #28a745;
-      height: 20px;
-    }
-
-    @media (max-width: 600px) {
-      body {
-        padding: 10px;
-      }
-    }
-
-    /* 按鈕容器樣式 */
-    .action-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-      margin: 30px 0;
-    }
-
-    .action-button {
-      background-color: #0051c3;
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      font-size: 16px;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .action-button:hover {
-      background-color: #003da1;
-    }
-
-    .action-button.green {
-      background-color: #28a745;
-    }
-
-    .action-button.green:hover {
-      background-color: #218838;
-    }
-
-    /* WiFi資訊表格樣式 */
-    .wifi-info-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 20px;
-      background-color: #f8f9fa;
-      border-radius: 8px;
-      overflow: hidden;
-    }
-
-    .wifi-info-table tr:nth-child(even) {
-      background-color: #f0f0f0;
-    }
-
-    .wifi-info-table tr:hover {
-      background-color: #e6f3ff;
-    }
-
-    .wifi-info-table td {
-      padding: 10px;
-      border-bottom: 1px solid #ddd;
-    }
-
-    .wifi-info-table td:first-child {
-      font-weight: bold;
-      width: 30%;
-      color: #0051c3;
+    @media (max-width: 560px) {
+      .topbar { flex-wrap: wrap; gap: 12px; }
+      .brand-sub { display: none; }
+      .brand-logo { height: 42px; }
+      .live-chips { grid-template-columns: repeat(2, 1fr); }
+      .metric-grid { grid-template-columns: 1fr; }
+      .bloat-grid { grid-template-columns: 1fr; }
+      .bar-line { grid-template-columns: 96px 1fr 56px; }
+      .verdict { justify-content: center; text-align: center; }
     }
   </style>
 </head>
 
 <body>
-  <h1>蓋斯克網路速度測試</h1>
-  <div id="controls"></div>
-  <div id="progressContainer">
-    <div class="test-item">
-      <div class="test-label">下載速度測試</div>
-      <div class="progress-bar">
-        <div id="downloadProgressBar" class="progress"></div>
+  <div class="wrap" id="capture-root">
+    <div class="topbar">
+      <div class="brand">
+        <img class="brand-logo" src="logo.png" alt="ZONE TECH 蓋斯克科技" width="651" height="181">
+        <span class="brand-sub">Network Diagnostics</span>
       </div>
-      <div id="downloadProgressText" class="progress-text">等待中...</div>
-      <div id="downloadResult" class="test-result"></div>
+      <div class="badge-pill"><span class="dot"></span> Cloudflare 全球節點</div>
     </div>
 
-    <div class="test-item">
-      <div class="test-label">上傳速度測試</div>
-      <div class="progress-bar">
-        <div id="uploadProgressBar" class="progress"></div>
-      </div>
-      <div id="uploadProgressText" class="progress-text">等待中...</div>
-      <div id="uploadResult" class="test-result"></div>
+    <div class="hero">
+      <h1>網路速度與健康診斷</h1>
+      <p>一次測出下載、上傳、延遲、抖動、丟包與 Bufferbloat，並對照台灣與全球平均，指出您的網路瓶頸。</p>
     </div>
 
-    <div class="test-item">
-      <div class="test-label">抖動測試</div>
-      <div class="progress-bar">
-        <div id="jitterProgressBar" class="progress"></div>
+    <div class="stage">
+      <div class="gauge-wrap">
+        <div class="gauge">
+          <svg viewBox="0 0 200 200">
+            <defs>
+              <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#3b82f6" /><stop offset="100%" stop-color="#06d6d6" />
+              </linearGradient>
+            </defs>
+            <!-- track: 270deg arc from 135deg to 405deg -->
+            <circle id="gaugeTrack" cx="100" cy="100" r="86" fill="none"
+              stroke="rgba(255,255,255,0.07)" stroke-width="14" stroke-linecap="round"
+              stroke-dasharray="405.3 540.4" transform="rotate(135 100 100)" />
+            <circle id="gaugeFill" cx="100" cy="100" r="86" fill="none"
+              stroke="url(#gaugeGrad)" stroke-width="14" stroke-linecap="round"
+              stroke-dasharray="0 540.4" transform="rotate(135 100 100)"
+              style="transition: stroke-dasharray .35s cubic-bezier(.2,.8,.2,1); filter: drop-shadow(0 0 8px rgba(59,130,246,.5));" />
+          </svg>
+          <div class="gauge-center">
+            <div class="gauge-phase" id="gaugePhase">準備就緒</div>
+            <div class="gauge-value" id="gaugeValue">0<span style="font-size:22px;color:var(--muted)"></span></div>
+            <div class="gauge-unit" id="gaugeUnit">點擊下方開始測試</div>
+          </div>
+        </div>
+
+        <div class="live-chips">
+          <div class="chip" id="chip-download"><div class="k">下載</div><div class="v" id="lv-download">—</div><div class="u">Mbps</div></div>
+          <div class="chip" id="chip-upload"><div class="k">上傳</div><div class="v" id="lv-upload">—</div><div class="u">Mbps</div></div>
+          <div class="chip" id="chip-latency"><div class="k">延遲</div><div class="v" id="lv-latency">—</div><div class="u">ms</div></div>
+          <div class="chip" id="chip-jitter"><div class="k">抖動</div><div class="v" id="lv-jitter">—</div><div class="u">ms</div></div>
+        </div>
       </div>
-      <div id="jitterProgressText" class="progress-text">等待中...</div>
-      <div id="jitterResult" class="test-result"></div>
+
+      <div class="actions">
+        <button class="btn btn-primary" id="startBtn">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
+          開始測速
+        </button>
+      </div>
+
+      <div id="phaseList">
+        <div class="plist">
+          <div class="prow" id="prow-download"><div class="st"></div><div class="pname">下載速度</div><div class="pval" id="pv-download"></div></div>
+          <div class="prow" id="prow-upload"><div class="st"></div><div class="pname">上傳速度</div><div class="pval" id="pv-upload"></div></div>
+          <div class="prow" id="prow-latency"><div class="st"></div><div class="pname">延遲與抖動</div><div class="pval" id="pv-latency"></div></div>
+          <div class="prow" id="prow-packetLoss"><div class="st"></div><div class="pname">封包遺失</div><div class="pval" id="pv-packetLoss"></div></div>
+        </div>
+      </div>
     </div>
 
-    <div class="test-item">
-      <div class="test-label">遺失封包測試</div>
-      <div class="progress-bar">
-        <div id="packetLossProgressBar" class="progress"></div>
-      </div>
-      <div id="packetLossProgressText" class="progress-text">等待中...</div>
-      <div id="packetLossResult" class="test-result"></div>
-    </div>
+    <div id="results"></div>
 
-    <div id="statusContainer">正在準備測試...</div>
-  </div>
-  <div id="result">
-    <div id="intro-text" style="text-align: center; padding: 20px; color: #666;">
-      <p>本測試將依序進行：</p>
-      <ol style="display: inline-block; text-align: left;">
-        <li>下載速度測試</li>
-        <li>上傳速度測試</li>
-        <li>抖動測試</li>
-        <li>遺失封包測試</li>
-      </ol>
-      <p>點擊上方「開始網路測速」按鈕開始測試</p>
+    <div class="foot">
+      測速引擎：<a href="https://speed.cloudflare.com" target="_blank" rel="noopener">Cloudflare</a> 全球邊緣網路 · 蓋斯克科技 zonetech.tw
     </div>
   </div>
 
   <script type="module">
     import SpeedTest from 'https://cdn.skypack.dev/@cloudflare/speedtest';
-    // 引入html2canvas庫用於將頁面轉換為圖片
     import html2canvas from 'https://cdn.skypack.dev/html2canvas';
 
-    const controlEl = document.getElementById('controls');
-    const resEl = document.getElementById('result');
-    const progressContainer = document.getElementById('progressContainer');
-    const progressBar = document.getElementById('progressBar');
-    const progressText = document.getElementById('progressText');
-    const statusContainer = document.getElementById('statusContainer');
+    /* =========================================================
+       業界參考基準值（Reference benchmarks）
+       來源概念：Ookla Speedtest Global Index 級距、Cloudflare AIM
+       這些為「業界典型參考值」，非即時官方統計，用於相對定位。
+       ========================================================= */
+    const BENCH = {
+      download: { tw: 145, global: 95 },   // Mbps 固網典型中位級距
+      upload:   { tw: 65,  global: 42 },   // Mbps
+      latency:  { good: 30, avg: 60 },     // ms（越低越好）
+      jitter:   { good: 10, avg: 30 },     // ms
+      packetLoss: { good: 0.5, avg: 2 },   // %
+      bufferbloat: { good: 30, avg: 60, poor: 150 } // ms 負載延遲增量
+    };
 
-    // 獲取各個測試項目的進度條元素
-    const downloadProgressBar = document.getElementById('downloadProgressBar');
-    const uploadProgressBar = document.getElementById('uploadProgressBar');
-    const jitterProgressBar = document.getElementById('jitterProgressBar');
-    const packetLossProgressBar = document.getElementById('packetLossProgressBar');
+    const $ = id => document.getElementById(id);
+    const fmt = (n, d = 1) => (n === null || n === undefined || isNaN(n)) ? '—' : Number(n).toFixed(d);
 
-    // 獲取各個測試項目的進度文本元素
-    const downloadProgressText = document.getElementById('downloadProgressText');
-    const uploadProgressText = document.getElementById('uploadProgressText');
-    const jitterProgressText = document.getElementById('jitterProgressText');
-    const packetLossProgressText = document.getElementById('packetLossProgressText');
+    const gaugeFill = $('gaugeFill');
+    const gaugePhase = $('gaugePhase');
+    const gaugeValue = $('gaugeValue');
+    const gaugeUnit = $('gaugeUnit');
+    const startBtn = $('startBtn');
+    const resultsEl = $('results');
+    const phaseList = $('phaseList');
+    const GAUGE_LEN = 540.4;           // 2πr, r=86
+    const GAUGE_ARC = 405.3;           // 270deg visible arc
 
-    // 獲取各個測試項目的結果元素
-    const downloadResult = document.getElementById('downloadResult');
-    const uploadResult = document.getElementById('uploadResult');
-    const jitterResult = document.getElementById('jitterResult');
-    const packetLossResult = document.getElementById('packetLossResult');
-
-    let testProgress = 0;
-    let testStages = ['下載速度測試', '上傳速度測試', '抖動測試', '遺失封包測試'];
-    let currentStage = 0;
-    let results = {};
     let engine = null;
-    let testIntervals = [];
+    let live = { download: 0, upload: 0, latency: 0, jitter: 0 };
+    let animTimer = null;
 
-    // 初始化測試引擎
-    function initSpeedTest() {
-      // 如果已有實例，先取消所有監聽
-      if (engine) {
-        try {
-          engine.abort();
-        } catch (e) {
-          console.error('停止測試時出錯:', e);
-        }
-      }
+    /* ---- gauge helpers ---- */
+    // sqrt scale up to 1000 Mbps gives pleasant spread
+    function speedToFrac(mbps) { return Math.max(0, Math.min(1, Math.sqrt(mbps / 1000))); }
+    function setGaugeSpeed(mbps) {
+      const frac = speedToFrac(mbps);
+      gaugeFill.setAttribute('stroke-dasharray', `${(GAUGE_ARC * frac).toFixed(1)} ${GAUGE_LEN}`);
+    }
+    function setGaugeProgress(frac) {
+      gaugeFill.setAttribute('stroke-dasharray', `${(GAUGE_ARC * Math.max(0, Math.min(1, frac))).toFixed(1)} ${GAUGE_LEN}`);
+    }
 
-      // 清除所有進行中的計時器
-      testIntervals.forEach(interval => clearInterval(interval));
-      testIntervals = [];
+    function setChip(kind, val) {
+      const el = $('lv-' + kind);
+      if (el) el.textContent = val;
+    }
+    function activeChip(kind) {
+      ['download', 'upload', 'latency', 'jitter'].forEach(k =>
+        $('chip-' + k).classList.toggle('active', k === kind));
+    }
+    function setRow(kind, state, val) {
+      const row = $('prow-' + kind);
+      if (!row) return;
+      row.classList.remove('doing', 'done');
+      if (state) row.classList.add(state);
+      if (val !== undefined) $('pv-' + kind).textContent = val;
+    }
 
-      // 創建新的測試引擎
-      engine = new SpeedTest({
-        autoStart: false
-      });
+    /* ---- run ---- */
+    function resetUI() {
+      resultsEl.style.display = 'none';
+      resultsEl.innerHTML = '';
+      phaseList.style.display = 'block';
+      live = { download: 0, upload: 0, latency: 0, jitter: 0 };
+      ['download', 'upload', 'latency', 'jitter'].forEach(k => setChip(k, '—'));
+      ['download', 'upload', 'latency', 'packetLoss'].forEach(k => setRow(k, '', ''));
+      setGaugeProgress(0);
+      gaugeValue.innerHTML = '0';
+      gaugePhase.textContent = '初始化';
+      gaugeUnit.textContent = '連線至最近節點…';
+    }
 
-      engine.onRunningChange = running => {
-        if (running) {
-          progressContainer.style.display = 'block';
-          controlEl.textContent = '';
-          statusContainer.textContent = '測試正在進行中...';
+    function startTest() {
+      if (engine) { try { engine.abort(); } catch (e) {} }
+      if (animTimer) clearInterval(animTimer);
+      resetUI();
+      startBtn.disabled = true;
+      startBtn.querySelector('svg').style.display = 'none';
+      startBtn.childNodes[startBtn.childNodes.length - 1].textContent = ' 測試進行中…';
 
-          // 隱藏介紹文字
-          const introText = document.getElementById('intro-text');
-          if (introText) {
-            introText.style.display = 'none';
-          }
-
-          // 初始化所有進度條
-          downloadProgressBar.style.width = '0%';
-          uploadProgressBar.style.width = '0%';
-          jitterProgressBar.style.width = '0%';
-          packetLossProgressBar.style.width = '0%';
-
-          downloadProgressText.textContent = '等待中...';
-          uploadProgressText.textContent = '等待中...';
-          jitterProgressText.textContent = '等待中...';
-          packetLossProgressText.textContent = '等待中...';
-
-          downloadResult.textContent = '';
-          uploadResult.textContent = '';
-          jitterResult.textContent = '';
-          packetLossResult.textContent = '';
-
-          // 開始下載測試進度模擬
-          const downloadInterval = simulateTestProgress('download');
-          testIntervals.push(downloadInterval);
-        } else {
-          statusContainer.textContent = '測試完成!';
-          setTimeout(() => {
-            progressContainer.style.display = 'none';
-            controlEl.textContent = '測試完成!';
-
-            // 顯示詳細測試報告
-            if (engine && engine.results) {
-              displayResults(engine.results.getSummary());
-            } else {
-              console.error('無法獲取測試結果');
-              statusContainer.textContent = '測試失敗，請重試';
-            }
-          }, 2000);
-        }
-      };
+      engine = new SpeedTest({ autoStart: true });
 
       engine.onResultsChange = ({ type }) => {
-        if (!engine || engine.isFinished) return;
+        if (!engine) return;
+        const s = engine.results.getSummary();
 
-        console.log(type);
-
-        if (type === 'download') {
-          results.download = engine.results.getSummary().download;
-          updateTestProgress('download', 100);
-          downloadResult.textContent = (results.download / 1000000).toFixed(2) + ' Mbps';
-
-          // 開始上傳測試進度模擬
-          const uploadInterval = simulateTestProgress('upload');
-          testIntervals.push(uploadInterval);
-        }
-        else if (type === 'upload') {
-          results.upload = engine.results.getSummary().upload;
-          updateTestProgress('upload', 100);
-          uploadResult.textContent = (results.upload / 1000000).toFixed(2) + ' Mbps';
-
-          // 開始抖動測試
-          const jitterInterval = simulateTestProgress('jitter');
-          testIntervals.push(jitterInterval);
-        }
-        else if (type === 'latency') {
-          results.latency = engine.results.getSummary().latency;
-
-          // 抖動結果從延遲測試中獲取
-          if (engine.results.getSummary().jitter) {
-            results.jitter = engine.results.getSummary().jitter;
-            updateTestProgress('jitter', 100);
-            jitterResult.textContent = results.jitter.toFixed(2) + ' ms';
-          }
-
-          // 開始丟包測試
-          const packetLossInterval = simulateTestProgress('packetLoss');
-          testIntervals.push(packetLossInterval);
-
-          // 模擬丟包測試結果
-          setTimeout(() => {
-            if (engine && engine.results) {
-              results.packetLoss = engine.results.getSummary().packetLoss || 0;
-              updateTestProgress('packetLoss', 100);
-              packetLossResult.textContent = results.packetLoss.toFixed(2) + '%';
-            }
-          }, 3500);
+        if (type === 'download' && s.download) {
+          live.download = s.download / 1e6;
+          gaugePhase.textContent = '下載測試';
+          activeChip('download');
+          setChip('download', fmt(live.download, 1));
+          setGaugeSpeed(live.download);
+          gaugeValue.innerHTML = fmt(live.download, 1);
+          gaugeUnit.textContent = 'Mbps 下載';
+          setRow('download', 'doing');
+        } else if (type === 'upload' && s.upload) {
+          live.upload = s.upload / 1e6;
+          gaugePhase.textContent = '上傳測試';
+          activeChip('upload');
+          setChip('upload', fmt(live.upload, 1));
+          setGaugeSpeed(live.upload);
+          gaugeValue.innerHTML = fmt(live.upload, 1);
+          gaugeUnit.textContent = 'Mbps 上傳';
+          setRow('download', 'done', fmt(live.download, 1) + ' Mbps');
+          setRow('upload', 'doing');
+        } else if (type === 'latency') {
+          if (s.latency) { live.latency = s.latency; setChip('latency', fmt(s.latency, 0)); }
+          if (s.jitter) { live.jitter = s.jitter; setChip('jitter', fmt(s.jitter, 1)); }
+          gaugePhase.textContent = '延遲測試';
+          activeChip('latency');
+          gaugeValue.innerHTML = fmt(s.latency, 0);
+          gaugeUnit.textContent = 'ms 延遲';
+          setRow('upload', 'done', fmt(live.upload, 1) + ' Mbps');
+          setRow('latency', 'doing');
+        } else if (type === 'packetLoss') {
+          setRow('latency', 'done', fmt(live.latency, 0) + ' ms / ' + fmt(live.jitter, 1) + ' ms');
+          setRow('packetLoss', 'doing');
+          gaugePhase.textContent = '封包測試';
         }
       };
 
       engine.onFinish = results => {
         const summary = results.getSummary();
-        console.log(summary);
-        console.log(results.getScores());
-
-        // 詳細測試報告會由 onRunningChange 中的回調顯示
+        let scores = {};
+        try { scores = results.getScores(); } catch (e) {}
+        setRow('packetLoss', 'done',
+          fmt((summary.packetLoss || 0) * 100, 1) + '%');
+        setGaugeProgress(1);
+        gaugePhase.textContent = '完成';
+        gaugeValue.innerHTML = fmt((summary.download || 0) / 1e6, 0);
+        gaugeUnit.textContent = 'Mbps 下載';
+        activeChip(null);
+        startBtn.disabled = false;
+        startBtn.querySelector('svg').style.display = '';
+        startBtn.childNodes[startBtn.childNodes.length - 1].textContent = ' 重新測速';
+        setTimeout(() => renderReport(summary, scores), 400);
       };
 
-      engine.onError = (e) => {
-        console.log(e);
-        statusContainer.textContent = '測試出錯: ' + e.message;
+      engine.onError = e => {
+        gaugePhase.textContent = '發生錯誤';
+        gaugeUnit.textContent = '請檢查網路後重試';
+        startBtn.disabled = false;
+        startBtn.querySelector('svg').style.display = '';
+        startBtn.childNodes[startBtn.childNodes.length - 1].textContent = ' 重新測速';
+        console.error(e);
       };
     }
 
-    // 初始化引擎
-    initSpeedTest();
+    startBtn.addEventListener('click', startTest);
 
-    // 創建開始測試按鈕
-    const playButton = document.createElement('button');
-    playButton.textContent = "開始網路測速";
-    playButton.onclick = () => {
-      // 確保測試引擎已正確初始化
-      resetTest();
-    };
-    controlEl.appendChild(playButton);
+    /* =========================================================
+       結果分析
+       ========================================================= */
+    function ratingByThreshold(val, goodAtOrAbove, warnAtOrAbove) {
+      if (val >= goodAtOrAbove) return 'good';
+      if (val >= warnAtOrAbove) return 'warn';
+      return 'poor';
+    }
+    function ratingLowerBetter(val, goodBelow, warnBelow) {
+      if (val <= goodBelow) return 'good';
+      if (val <= warnBelow) return 'warn';
+      return 'poor';
+    }
+    const pillClass = r => r === 'good' ? 'pill-good' : r === 'warn' ? 'pill-warn' : 'pill-poor';
+    const pillText = r => r === 'good' ? '良好' : r === 'warn' ? '普通' : '偏弱';
 
-    function updateTestProgress(testType, percent) {
+    function renderReport(s, scores) {
+      const dl = (s.download || 0) / 1e6;
+      const ul = (s.upload || 0) / 1e6;
+      const lat = s.latency || 0;
+      const jit = s.jitter || 0;
+      const loss = (s.packetLoss || 0) * 100;
+      const dLat = s.downLoadedLatency || 0;
+      const uLat = s.upLoadedLatency || 0;
+      const worstLoaded = Math.max(dLat, uLat);
+      const bloat = Math.max(0, worstLoaded - lat);
+
+      const diag = analyze({ dl, ul, lat, jit, loss, bloat, dLat, uLat });
+      const overall = scoreOverall({ dl, ul, lat, jit, loss, bloat });
+
+      const html = `
+        ${verdictCard(overall, diag)}
+        ${metricsCard(dl, ul, lat, jit, loss, worstLoaded)}
+        ${benchCard(dl, ul)}
+        ${bufferbloatCard(lat, dLat, uLat, bloat)}
+        ${diagnosisCard(diag)}
+        ${useCaseCard({ dl, ul, lat, jit, loss, bloat })}
+        <div class="actions" style="margin-top:26px">
+          <button class="btn btn-primary" id="reBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36" /><path d="M21 3v6h-6" /></svg>
+            再測一次
+          </button>
+          <button class="btn btn-ghost" id="saveBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><path d="M7 10l5 5 5-5" /><path d="M12 15V3" /></svg>
+            儲存報告圖片
+          </button>
+        </div>
+        <div class="disclaimer">
+          比較基準為業界典型參考值（概念參照 Ookla Speedtest Global Index 級距與 Cloudflare AIM 指標），
+          非即時官方統計；實際體驗仍受服務商方案、Wi‑Fi 環境與時段影響。單次測試結果會有波動，建議不同時段多測幾次取平均。
+        </div>`;
+      resultsEl.innerHTML = html;
+      resultsEl.style.display = 'block';
+      phaseList.style.display = 'none';
+
+      // animate benchmark bars in
       requestAnimationFrame(() => {
-        switch (testType) {
-          case 'download':
-            downloadProgressBar.style.width = percent + '%';
-            downloadProgressText.textContent = percent + '%';
-            break;
-          case 'upload':
-            uploadProgressBar.style.width = percent + '%';
-            uploadProgressText.textContent = percent + '%';
-            break;
-          case 'jitter':
-            jitterProgressBar.style.width = percent + '%';
-            jitterProgressText.textContent = percent + '%';
-            break;
-          case 'packetLoss':
-            packetLossProgressBar.style.width = percent + '%';
-            packetLossProgressText.textContent = percent + '%';
-            break;
-        }
-      });
-    }
-
-    function simulateTestProgress(testType) {
-      let startTime = Date.now();
-      let lastProgress = 0;
-      let duration = 0;
-
-      // 為每種測試類型設置不同的持續時間
-      switch (testType) {
-        case 'download': duration = 5000; break;
-        case 'upload': duration = 5000; break;
-        case 'jitter': duration = 3000; break;
-        case 'packetLoss': duration = 3500; break;
-      }
-
-      // 更新進度文本顯示為測試中
-      switch (testType) {
-        case 'download': downloadProgressText.textContent = '測試中...'; break;
-        case 'upload': uploadProgressText.textContent = '測試中...'; break;
-        case 'jitter': jitterProgressText.textContent = '測試中...'; break;
-        case 'packetLoss': packetLossProgressText.textContent = '測試中...'; break;
-      }
-
-      let interval = setInterval(() => {
-        let elapsed = Date.now() - startTime;
-        let progress = Math.min(Math.floor((elapsed / duration) * 100), 99);
-
-        if (progress > lastProgress) {
-          lastProgress = progress;
-          updateTestProgress(testType, progress);
-        }
-
-        if (progress >= 99) {
-          clearInterval(interval);
-        }
-      }, 50);
-
-      return interval;
-    }
-
-    // 完全重置測試的函數
-    function resetTest() {
-      resetProgress();
-      initSpeedTest();
-
-      // 重置界面
-      resEl.innerHTML = '';
-      const introText = document.createElement('div');
-      introText.id = 'intro-text';
-      introText.style.textAlign = 'center';
-      introText.style.padding = '20px';
-      introText.style.color = '#666';
-
-      const p1 = document.createElement('p');
-      p1.textContent = '本測試將依序進行：';
-      introText.appendChild(p1);
-
-      const ol = document.createElement('ol');
-      ol.style.display = 'inline-block';
-      ol.style.textAlign = 'left';
-
-      const stages = ['下載速度測試', '上傳速度測試', '抖動測試', '遺失封包測試'];
-      stages.forEach(stage => {
-        const li = document.createElement('li');
-        li.textContent = stage;
-        ol.appendChild(li);
+        document.querySelectorAll('.bar-fill').forEach(b => { b.style.width = b.dataset.w; });
+        drawRing(overall.score);
       });
 
-      introText.appendChild(ol);
-
-      const p2 = document.createElement('p');
-      p2.textContent = '測試進行中，請稍候...';
-      introText.appendChild(p2);
-
-      resEl.appendChild(introText);
-
-      // 開始新測試
-      setTimeout(() => {
-        if (engine) {
-          engine.play();
-        } else {
-          console.error('測試引擎未初始化');
-          statusContainer.textContent = '測試初始化失敗，請重新載入頁面';
-        }
-      }, 500);
+      $('reBtn').addEventListener('click', () => { resultsEl.scrollIntoView({ behavior: 'smooth' }); startTest(); });
+      $('saveBtn').addEventListener('click', saveImage);
+      resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    function resetProgress() {
-      testProgress = 0;
-      currentStage = 0;
+    /* ---- diagnosis engine ---- */
+    function analyze({ dl, ul, lat, jit, loss, bloat, dLat, uLat }) {
+      const issues = [];
 
-      // 重置所有進度條
-      downloadProgressBar.style.width = '0%';
-      uploadProgressBar.style.width = '0%';
-      jitterProgressBar.style.width = '0%';
-      packetLossProgressBar.style.width = '0%';
+      // 1) Packet loss — 連線穩定性最關鍵
+      if (loss > 2) issues.push({ sev: 'critical', weight: 100, area: '線路穩定性', ico: '📉',
+        title: `封包遺失偏高（${fmt(loss, 1)}%）`,
+        detail: '資料在傳輸途中大量遺失，通話會斷音、遊戲會瞬移、網頁會卡住重載。這通常是實體線路老化、接頭鬆脫、或無線干擾造成。',
+        fix: '優先<b>改用網路線直連</b>路由器測試；若有線仍高，聯繫 ISP 檢修線路或數據機。' });
+      else if (loss > BENCH.packetLoss.good) issues.push({ sev: 'warning', weight: 55, area: '線路穩定性', ico: '📉',
+        title: `輕微封包遺失（${fmt(loss, 1)}%）`,
+        detail: '偶發性遺失，一般瀏覽影響不大，但對即時語音／視訊會偶爾造成破碎。',
+        fix: '觀察是否集中在特定時段；<b>換一條網路線、遠離微波爐與 2.4GHz 干擾源</b>。' });
 
-      downloadProgressText.textContent = '等待中...';
-      uploadProgressText.textContent = '等待中...';
-      jitterProgressText.textContent = '等待中...';
-      packetLossProgressText.textContent = '等待中...';
+      // 2) Bufferbloat — 負載下延遲暴增（專業關鍵指標）
+      if (bloat > BENCH.bufferbloat.poor) issues.push({ sev: 'critical', weight: 95, area: 'Bufferbloat（緩衝膨脹）', ico: '🌊',
+        title: `負載延遲暴增 +${fmt(bloat, 0)} ms`,
+        detail: '一有人下載或上傳，延遲就從 ' + fmt(lat, 0) + ' ms 飆到 ' + fmt(lat + bloat, 0) + ' ms。這是典型的 Bufferbloat：路由器緩衝區塞爆，導致「有人在用網路時全家都變慢」。這往往比頻寬不足更影響實際體感。',
+        fix: '在路由器<b>啟用 SQM／QoS（智慧佇列管理）</b>，或升級支援 fq_codel 的機種（如 OpenWrt、部分電競路由器）即可大幅改善。' });
+      else if (bloat > BENCH.bufferbloat.avg) issues.push({ sev: 'warning', weight: 60, area: 'Bufferbloat（緩衝膨脹）', ico: '🌊',
+        title: `負載時延遲上升 +${fmt(bloat, 0)} ms`,
+        detail: '滿載時延遲中度增加，多人同時使用時，視訊與遊戲可能偶爾頓一下。',
+        fix: '路由器<b>開啟 QoS</b>，並把上傳頻寬上限設為實測值的 ~90%，可壓下負載延遲。' });
 
-      downloadResult.textContent = '';
-      uploadResult.textContent = '';
-      jitterResult.textContent = '';
-      packetLossResult.textContent = '';
+      // 3) Idle latency 高 — 反應遲鈍
+      if (lat > 120) issues.push({ sev: 'critical', weight: 80, area: '基礎延遲', ico: '🐌',
+        title: `基礎延遲過高（${fmt(lat, 0)} ms）`,
+        detail: '即使閒置，連到最近節點都要 ' + fmt(lat, 0) + ' ms。網頁點擊會有明顯遲滯，競技遊戲幾乎無法玩。可能是走了衛星／行動網路、路由繞遠、或 Wi‑Fi 訊號差。',
+        fix: '改用<b>有線連線</b>確認是否為 Wi‑Fi 問題；若有線仍高，多半是 ISP 路由或線路型態限制。' });
+      else if (lat > BENCH.latency.avg) issues.push({ sev: 'warning', weight: 45, area: '基礎延遲', ico: '🐌',
+        title: `基礎延遲略高（${fmt(lat, 0)} ms）`,
+        detail: '一般瀏覽與串流沒問題，但對延遲敏感的競技遊戲、視訊互動會略感遲鈍。',
+        fix: '靠近路由器或<b>改用 5GHz／有線</b>；避免同時掛大量背景下載。' });
 
-      results = {};
+      // 4) Jitter 高 — 不穩
+      if (jit > 50) issues.push({ sev: 'critical', weight: 70, area: '連線抖動', ico: '📶',
+        title: `抖動過大（${fmt(jit, 1)} ms）`,
+        detail: '延遲忽高忽低，代表連線很不穩。這是視訊會議破音、遊戲忽快忽慢的主因，通常來自 Wi‑Fi 干擾或線路品質不良。',
+        fix: '<b>改用有線或切換 Wi‑Fi 頻道</b>；遠離其他無線裝置密集處。' });
+      else if (jit > BENCH.jitter.avg) issues.push({ sev: 'warning', weight: 40, area: '連線抖動', ico: '📶',
+        title: `抖動偏高（${fmt(jit, 1)} ms）`,
+        detail: '連線穩定度普通，多數應用可用，但重要視訊會議可能偶有卡頓。',
+        fix: '優先<b>使用 5GHz 或有線</b>連線以降低抖動。' });
+
+      // 5) 下載頻寬不足
+      if (dl < 25) issues.push({ sev: 'critical', weight: 75, area: '下載頻寬', ico: '⬇️',
+        title: `下載速度偏慢（${fmt(dl, 1)} Mbps）`,
+        detail: '低於台灣家庭常見水準（約 ' + BENCH.download.tw + ' Mbps），4K 串流、多人同時使用會吃力。可能是方案本身較低、Wi‑Fi 訊號衰減、或分享器瓶頸。',
+        fix: '先<b>有線直測</b>排除 Wi‑Fi；若有線仍低，考慮升級 ISP 方案或檢查數據機是否老舊。' });
+      else if (dl < BENCH.download.global) issues.push({ sev: 'warning', weight: 35, area: '下載頻寬', ico: '⬇️',
+        title: `下載速度低於平均（${fmt(dl, 1)} Mbps）`,
+        detail: '日常使用足夠，但低於全球平均（約 ' + BENCH.download.global + ' Mbps），多裝置同時看高畫質影片時可能互相排擠。',
+        fix: '確認是否有背景裝置佔用；<b>靠近路由器或用有線</b>可拉高實測值。' });
+
+      // 6) 上傳過低
+      if (ul < 10) issues.push({ sev: 'warning', weight: 50, area: '上傳頻寬', ico: '⬆️',
+        title: `上傳速度偏低（${fmt(ul, 1)} Mbps）`,
+        detail: '視訊會議畫面可能糊、雲端備份與大檔上傳很慢。非對稱線路（如部分 Cable）上傳天生較低。',
+        fix: '視訊會議者建議<b>升級對稱式光纖方案</b>；備份可排在離峰時段。' });
+
+      // 排序：嚴重優先、權重高優先
+      issues.sort((a, b) => (b.sev === 'critical') - (a.sev === 'critical') || b.weight - a.weight);
+      return issues;
     }
 
-    function displayResults(data) {
-      resEl.innerHTML = '';
+    function scoreOverall({ dl, ul, lat, jit, loss, bloat }) {
+      // 原始分（0-100，權重）
+      const dS = Math.min(1, Math.sqrt(dl / 300));          // 300Mbps 封頂滿分
+      const uS = Math.min(1, Math.sqrt(ul / 150));
+      const lS = Math.max(0, 1 - lat / 150);
+      const jS = Math.max(0, 1 - jit / 60);
+      const pS = loss <= 0 ? 1 : Math.max(0, 1 - loss / 5);
+      const bS = Math.max(0, 1 - bloat / 200);              // bufferbloat 納入評分
+      let raw = (dS * 26 + uS * 14 + lS * 20 + jS * 14 + pS * 14 + bS * 12);
 
-      // 創建結果容器
-      const resultContent = document.createElement('div');
+      // 短板封頂：任何關鍵指標很差就限制總分（避免高頻寬掩蓋爛穩定度）
+      const critical = loss > 2 || bloat > 150 || lat > 120 || jit > 50 || dl < 25;
+      const average = !critical && (loss > 0.5 || bloat > 60 || lat > 60 || jit > 30 || dl < 95);
+      if (critical) raw = Math.min(raw, 59);
+      else if (average) raw = Math.min(raw, 82);
 
-      // 添加標題
-      const title = document.createElement('h2');
-      title.textContent = '網路速度測試結果分析';
-      resultContent.appendChild(title);
-
-      // WiFi網路資訊部分 - 已移除 (因無法獲取真實數據，避免誤導)
-      /* 
-      // 原有代碼已移除
-      const wifiSection = document.createElement('div');
-      ...
-      */
-
-      // 基本網路參數部分
-      const basicSection = document.createElement('div');
-      basicSection.className = 'result-section';
-
-      const basicTitle = document.createElement('h3');
-      basicTitle.textContent = '基本網路參數';
-      basicSection.appendChild(basicTitle);
-
-      // 下載速度
-      const dlVal = data.download || 0;
-      const downloadMbps = (dlVal / 1000000).toFixed(2);
-      const downloadMBps = (downloadMbps / 8).toFixed(2);
-      addMetric(basicSection, '下載速度', `${downloadMbps} Mbps (${downloadMBps} MB/s)`, getRatingClass(downloadMbps, 50, 100));
-      addDetail(basicSection, `這相當於每秒約 ${downloadMBps} MB 的下載速度`);
-
-      if (downloadMbps > 100) {
-        addDetail(basicSection, '非常適合高清視頻流、大文件下載和多設備同時使用');
-      } else if (downloadMbps > 25) {
-        addDetail(basicSection, '適合多數網路活動，包括視頻流和一般下載需求');
-      } else {
-        addDetail(basicSection, '足夠基本的網頁瀏覽，但高清視頻流可能會有困難');
-      }
-
-      // 上傳速度
-      const ulVal = data.upload || 0;
-      const uploadMbps = (ulVal / 1000000).toFixed(2);
-      const uploadMBps = (uploadMbps / 8).toFixed(2);
-      addMetric(basicSection, '上傳速度', `${uploadMbps} Mbps (${uploadMBps} MB/s)`, getRatingClass(uploadMbps, 30, 50));
-      addDetail(basicSection, `相當於每秒約 ${uploadMBps} MB 的上傳速度`);
-
-      if (uploadMbps > 50) {
-        addDetail(basicSection, '非常適合視頻會議、快速文件上傳和雲備份');
-      } else if (uploadMbps > 30) {
-        addDetail(basicSection, '足夠進行視頻通話、上傳文件和雲備份');
-      } else {
-        addDetail(basicSection, '可以進行基本的上傳任務，但大文件上傳可能較慢');
-      }
-
-      resultContent.appendChild(basicSection);
-
-      // 網路質量參數部分
-      const qualitySection = document.createElement('div');
-      qualitySection.className = 'result-section';
-
-      const qualityTitle = document.createElement('h3');
-      qualityTitle.textContent = '網路質量參數';
-      qualitySection.appendChild(qualityTitle);
-
-      // 延遲（基礎）
-      const latVal = data.latency || 0;
-      const latency = latVal.toFixed(2);
-      addMetric(qualitySection, '延遲（基礎）', `${latency} 毫秒`, getRatingClass(50 - latency, 0, 30));
-      addDetail(qualitySection, '這是網路請求的往返時間');
-
-      if (latency < 20) {
-        addDetail(qualitySection, '極佳的延遲，適合競技遊戲和實時應用');
-      } else if (latency < 50) {
-        addDetail(qualitySection, '這個延遲值適合一般網頁瀏覽和視頻通話');
-      } else {
-        addDetail(qualitySection, '可能會在視頻通話和在線遊戲中感到一些延遲');
-      }
-
-      // 抖動（基礎）
-      const jitVal = data.jitter || 0;
-      const jitter = jitVal.toFixed(2);
-      addMetric(qualitySection, '抖動（基礎）', `${jitter} 毫秒`, getRatingClass(30 - jitter, 0, 20));
-      addDetail(qualitySection, '表示延遲變化的程度');
-
-      if (jitter < 5) {
-        addDetail(qualitySection, '極低的抖動，網路非常穩定');
-      } else if (jitter < 30) {
-        addDetail(qualitySection, '在可接受範圍內，大多數應用不會受到影響');
-      } else {
-        addDetail(qualitySection, '較高的抖動可能導致視頻通話和遊戲出現卡頓');
-      }
-
-      // 下載時延遲
-      if (data.downLoadedLatency) {
-        const dlLatency = data.downLoadedLatency.toFixed(2);
-        addMetric(qualitySection, '下載時延遲', `${dlLatency} 毫秒`, getRatingClass(60 - dlLatency, 0, 30));
-        addDetail(qualitySection, '在進行下載時測量的延遲');
-        addDetail(qualitySection, '在下載過程中延遲有所增加，這是正常現象');
-      }
-
-      // 下載時抖動
-      if (data.downLoadedJitter) {
-        const dlJitter = data.downLoadedJitter.toFixed(2);
-        addMetric(qualitySection, '下載時抖動', `${dlJitter} 毫秒`, getRatingClass(30 - dlJitter, 0, 20));
-        addDetail(qualitySection, `下載過程中的抖動${dlJitter < jitter ? '降低' : '增加'}了`);
-      }
-
-      // 上傳時延遲
-      if (data.upLoadedLatency) {
-        const ulLatency = data.upLoadedLatency.toFixed(2);
-        addMetric(qualitySection, '上傳時延遲', `${ulLatency} 毫秒`, getRatingClass(70 - ulLatency, 0, 30));
-        addDetail(qualitySection, '上傳過程中測量的延遲');
-        addDetail(qualitySection, '比基礎延遲高，因為上傳會佔用更多頻寬');
-      }
-
-      // 上傳時抖動
-      if (data.upLoadedJitter) {
-        const ulJitter = data.upLoadedJitter.toFixed(2);
-        addMetric(qualitySection, '上傳時抖動', `${ulJitter} 毫秒`, getRatingClass(50 - ulJitter, 0, 30));
-        if (ulJitter > 50) {
-          addDetail(qualitySection, '上傳過程中抖動明顯增加');
-          addDetail(qualitySection, '這可能會在視頻會議等應用中造成一些不穩定');
-        } else {
-          addDetail(qualitySection, '上傳過程中的抖動在可接受範圍內');
-        }
-      }
-
-      // 丟包率
-      if (data.packetLoss !== undefined) {
-        const packetLoss = data.packetLoss.toFixed(2);
-        addMetric(qualitySection, '丟包率', `${packetLoss}%`, packetLoss === 0 ? 'good' : (packetLoss < 2 ? 'warning' : 'poor'));
-
-        if (packetLoss === 0) {
-          addDetail(qualitySection, '完美的丟包率，表示數據傳輸非常可靠');
-        } else if (packetLoss < 2) {
-          addDetail(qualitySection, '丟包率較低，大多數應用不會受到明顯影響');
-        } else {
-          addDetail(qualitySection, '丟包率較高，可能會影響視頻通話和遊戲體驗');
-        }
-      }
-
-      resultContent.appendChild(qualitySection);
-
-      // 總體評價
-      const overallSection = document.createElement('div');
-      overallSection.className = 'result-section';
-
-      const overallTitle = document.createElement('h3');
-      overallTitle.textContent = '總體評價';
-      overallSection.appendChild(overallTitle);
-
-      // 計算總體評分
-      let overallScore = 0;
-
-      // 確保將字串轉換為數字
-      const dlMbps = parseFloat(downloadMbps) || 0;
-      const ulMbps = parseFloat(uploadMbps) || 0;
-      const lat = parseFloat(latency) || 0;
-      const jit = typeof jitter !== 'undefined' ? (parseFloat(jitter) || 0) : 0;
-      const pl = (data.packetLoss !== undefined) ? data.packetLoss : 0;
-
-      // 獲取負載時的指標
-      const dlLat = data.downLoadedLatency ? parseFloat(data.downLoadedLatency.toFixed(2)) : 0;
-      const dlJit = data.downLoadedJitter ? parseFloat(data.downLoadedJitter.toFixed(2)) : 0;
-      const ulLat = data.upLoadedLatency ? parseFloat(data.upLoadedLatency.toFixed(2)) : 0;
-      const ulJit = data.upLoadedJitter ? parseFloat(data.upLoadedJitter.toFixed(2)) : 0;
-
-      // === 嚴格評分系統 (短板效應封頂機制) ===
-
-      // 定義閾值 (參考業界標準)
-      let isPoor = false;
-      let isAverage = false;
-      let poorReasons = [];
-
-      // 檢查是否為「較差」 (Poor) - 此標準下，總分上限為 59
-      if (lat > 100) { isPoor = true; poorReasons.push('基礎延遲過高'); }
-      if (jit > 50) { isPoor = true; poorReasons.push('基礎抖動過高'); }
-      if (dlLat > 200) { isPoor = true; poorReasons.push('下載延遲嚴重'); } // 負載時放寬一些
-      if (dlJit > 50) { isPoor = true; poorReasons.push('下載抖動嚴重'); }
-      if (ulLat > 200) { isPoor = true; poorReasons.push('上傳延遲嚴重'); }
-      if (ulJit > 50) { isPoor = true; poorReasons.push('上傳抖動嚴重'); }
-      if (pl > 2) { isPoor = true; poorReasons.push('丟包嚴重'); }
-
-      // 檢查是否為「普通」 (Average) - 此標準下，總分上限為 79
-      if (!isPoor) {
-        if (lat > 50) isAverage = true;
-        if (jit > 30) isAverage = true;
-        if (dlLat > 60) isAverage = true;
-        if (dlJit > 30) isAverage = true;
-        if (ulLat > 60) isAverage = true;
-        if (ulJit > 30) isAverage = true;
-        if (pl > 0.5) isAverage = true;
-      }
-
-      // 原始分數計算
-      let downloadScore = Math.min(5, dlMbps / 20);
-      let uploadScore = 0;
-      if (ulMbps <= 30) {
-        uploadScore = Math.min(1.25, ulMbps / 24);
-      } else {
-        uploadScore = Math.min(5, 1.25 + (ulMbps - 30) * 3.75 / 20);
-      }
-      let latencyScore = Math.min(5, Math.max(0, 6 - (lat / 20)));
-      let jitterScore = Math.min(5, Math.max(0, 5 - (jit / 10)));
-      let packetLossScore = pl === 0 ? 5 : Math.max(0, 5 - pl * 2.5);
-
-      // 加權總分
-      let rawScore = (downloadScore * 35 + uploadScore * 20 + latencyScore * 20 + jitterScore * 15 + packetLossScore * 10) / 5;
-      if (isNaN(rawScore)) rawScore = 0;
-
-      // === 應用封頂規則 ===
-      if (isPoor) {
-        // 紅燈規則: 強制封頂 59 (較差)
-        overallScore = Math.min(rawScore, 59);
-        console.log('觸發紅燈規則 (Poor)，分數限制為 59。原因:', poorReasons);
-      } else if (isAverage) {
-        // 黃燈規則: 強制封頂 79 (普通)
-        overallScore = Math.min(rawScore, 79);
-        console.log('觸發黃燈規則 (Average)，分數限制為 79');
-      } else {
-        overallScore = rawScore;
-      }
-
-      let overallRating = '';
-      let overallClass = '';
-
-      // 調整後的評級區間
-      if (overallScore >= 90) {
-        overallRating = '極佳';
-        overallClass = 'good'; // 深綠/藍
-      } else if (overallScore >= 80) {
-        overallRating = '良好';
-        overallClass = 'good';
-      } else if (overallScore >= 60) {
-        overallRating = '普通'; // 60-79 為普通
-        overallClass = 'warning'; // 黃色
-      } else {
-        overallRating = '較差';
-        overallClass = 'poor'; // 紅色
-      }
-
-      const overallDiv = document.createElement('div');
-      overallDiv.className = 'overall-rating';
-      overallDiv.innerHTML = `您的網路質量總體評價: <span class="${overallClass}">${overallRating}</span> (${Math.round(overallScore)}/100)`;
-      overallSection.appendChild(overallDiv);
-
-      // 總體評價文字
-      const overallText = document.createElement('p');
-      if (isPoor) {
-        overallText.textContent = '您的網路在某些關鍵指標（如抖動或延遲）表現較差，這會顯著影響即時應用體驗。';
-      } else if (isAverage) {
-        overallText.textContent = '您的網路表現普通，大部分應用可正常使用，但高互動需求應用可能偶有延遲。';
-      } else {
-        overallText.textContent = '您的網路連接整體表現' + overallRating + '，';
-        if (overallScore >= 90) overallText.textContent += '非常適合各類高強度網路應用。';
-        else overallText.textContent += '足以應付絕大多數日常需求。';
-      }
-      overallSection.appendChild(overallText);
-
-      const overallList = document.createElement('ul');
-
-      if (downloadMbps > 100) {
-        addListItem(overallList, '下載速度非常快，適合幾乎所有網路活動');
-      } else if (downloadMbps > 25) {
-        addListItem(overallList, '下載速度良好，適合大多數日常使用');
-      } else {
-        addListItem(overallList, '下載速度一般，基本網路活動可能較慢');
-      }
-
-      if (uploadMbps > 50) {
-        addListItem(overallList, '上傳速度優秀，適合視頻會議和大文件上傳');
-      } else if (uploadMbps > 30) {
-        addListItem(overallList, '上傳速度足夠日常使用，但對於大文件上傳可能會感覺較慢');
-      } else {
-        addListItem(overallList, '上傳速度較慢，可能不適合視頻會議或頻繁上傳');
-      }
-
-      if (latency < 30) {
-        addListItem(overallList, '延遲很低，適合實時在線遊戲和視頻通話');
-      } else if (latency < 70) {
-        addListItem(overallList, '延遲適中，適合大多數在線活動');
-      } else {
-        addListItem(overallList, '延遲較高，可能會影響實時應用體驗');
-      }
-
-      if (data.upLoadedJitter > 50) {
-        addListItem(overallList, '上傳時的高抖動可能會在視頻通話或在線遊戲中偶爾造成卡頓');
-      }
-
-      overallSection.appendChild(overallList);
-
-      const conclusion = document.createElement('p');
-      if (isPoor) {
-        conclusion.textContent = '建議檢查網路設備與環境，改善不穩定因素。';
-        conclusion.style.color = '#d9534f';
-      } else if (overallScore >= 70) {
-        conclusion.textContent = '這個連接非常適合家庭或小型辦公室使用，能夠滿足多人同時使用的需求。';
-        if (latency > 50 || data.upLoadedJitter > 70) {
-          conclusion.textContent += '如果您需要進行對延遲敏感的活動（如競技遊戲），可能需要考慮提升網路穩定性。';
-        }
-      } else if (overallScore >= 60) {
-        conclusion.textContent = '這個連接足夠一般家庭基本使用，但多人同時使用高頻寬應用可能會遇到問題。';
-      } else {
-        conclusion.textContent = '這個連接可能不適合高強度的網路活動，建議聯繫您的網路服務提供商了解升級選項。';
-      }
-      overallSection.appendChild(conclusion);
-
-      resultContent.appendChild(overallSection);
-
-      // 創建按鈕容器
-      const actionButtons = document.createElement('div');
-      actionButtons.className = 'action-buttons';
-
-      // 創建保存圖片按鈕
-      const saveButton = document.createElement('button');
-      saveButton.className = 'action-button';
-      saveButton.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19 21H5C3.89543 21 3 20.1046 3 19V5C3 3.89543 3.89543 3 5 3H14.5858C14.851 3 15.1054 3.10536 15.2929 3.29289L20.7071 8.70711C20.8946 8.89464 21 9.149 21 9.41421V19C21 20.1046 20.1046 21 19 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.6 9H15.4C15.7314 9 16 8.73137 16 8.4V3.6C16 3.26863 15.7314 3 15.4 3H8.6C8.26863 3 8 3.26863 8 3.6V8.4C8 8.73137 8.26863 9 8.6 9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 21V15C8 13.8954 8.89543 13 10 13H14C15.1046 13 16 13.8954 16 15V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> 儲存圖片';
-      saveButton.onclick = saveAsImage;
-      actionButtons.appendChild(saveButton);
-
-      // 創建再次測試按鈕
-      const retestButton = document.createElement('button');
-      retestButton.className = 'action-button green';
-      retestButton.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17.6569 16.6569C16.7202 17.5935 15.4891 18.2475 14.1435 18.5241C12.7979 18.8007 11.403 18.6863 10.1329 18.1938C8.86271 17.7013 7.76536 16.8501 6.97747 15.7442C6.18959 14.6383 5.74673 13.3282 5.69992 11.9793C5.65312 10.6304 6.00422 9.29499 6.71103 8.14207C7.41783 6.98915 8.4553 6.06865 9.69966 5.50427C10.944 4.93989 12.3401 4.75236 13.7172 4.96472C15.0943 5.17707 16.3841 5.78078 17.4262 6.69705L20 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 3V9H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> 再測試一次';
-      retestButton.onclick = function () { window.location.reload(); };
-      actionButtons.appendChild(retestButton);
-
-      resultContent.appendChild(actionButtons);
-
-      resEl.appendChild(resultContent);
+      const score = Math.round(Math.max(3, raw));
+      let rating, cls;
+      if (score >= 90) { rating = '極佳'; cls = 'good'; }
+      else if (score >= 80) { rating = '良好'; cls = 'good'; }
+      else if (score >= 60) { rating = '普通'; cls = 'warn'; }
+      else { rating = '偏弱'; cls = 'poor'; }
+      return { score, rating, cls };
     }
 
-    // 保存測試結果為圖片的函數
-    function saveAsImage() {
-      const resultEl = document.getElementById('result');
-      const saveButton = document.querySelector('.action-button');
+    /* ---- report cards ---- */
+    function verdictCard(overall, diag) {
+      const top = diag.find(d => d.sev === 'critical') || diag.find(d => d.sev === 'warning');
+      let headline, sub;
+      if (!top) {
+        headline = '沒有偵測到明顯瓶頸，各項指標都在健康範圍。';
+        sub = '您的網路很適合高畫質串流、視訊會議與線上遊戲同時進行。';
+      } else {
+        headline = `主要瓶頸：<b>${top.area}</b> — ${top.title}`;
+        const others = diag.filter(d => d !== top && d.sev !== 'good');
+        sub = others.length
+          ? `另外還偵測到 ${others.length} 項待改善（${others.map(o => o.area).join('、')}）。詳見下方診斷報告。`
+          : '這是目前最值得優先處理的項目，詳見下方診斷報告。';
+      }
+      return `
+      <div class="section">
+        <div class="card verdict">
+          <div class="score-ring">
+            <svg width="126" height="126">
+              <circle cx="63" cy="63" r="54" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="11" />
+              <circle id="ringFill" cx="63" cy="63" r="54" fill="none" stroke="url(#gaugeGrad)" stroke-width="11"
+                stroke-linecap="round" stroke-dasharray="0 339.3" />
+            </svg>
+            <div class="num"><b class="t-${overall.cls}">${overall.score}</b><span>/ 100</span></div>
+          </div>
+          <div class="verdict-body">
+            <div class="verdict-rating t-${overall.cls}">網路健康度：${overall.rating}</div>
+            <div class="verdict-head">${headline}</div>
+            <div class="verdict-sub">${sub}</div>
+          </div>
+        </div>
+      </div>`;
+    }
 
-      // 暫時隱藏按鈕以避免其出現在截圖中
-      const actionButtons = document.querySelector('.action-buttons');
-      const originalDisplay = actionButtons.style.display;
-      actionButtons.style.display = 'none';
+    function metricCell(label, val, unit, rating, note) {
+      return `
+      <div class="metric">
+        <div class="top"><span class="label">${label}</span>
+          <span class="pill ${pillClass(rating)}">${pillText(rating)}</span></div>
+        <div class="big t-${rating}">${val}<small> ${unit}</small></div>
+        <div class="note">${note}</div>
+      </div>`;
+    }
+    function metricsCard(dl, ul, lat, jit, loss, worstLoaded) {
+      const rDl = ratingByThreshold(dl, BENCH.download.global, 25);
+      const rUl = ratingByThreshold(ul, BENCH.upload.global, 10);
+      const rLat = ratingLowerBetter(lat, BENCH.latency.good, BENCH.latency.avg);
+      const rJit = ratingLowerBetter(jit, BENCH.jitter.good, BENCH.jitter.avg);
+      const rLoss = ratingLowerBetter(loss, BENCH.packetLoss.good, BENCH.packetLoss.avg);
+      const rLoad = ratingLowerBetter(worstLoaded, 60, 150);
+      return `
+      <div class="section">
+        <div class="section-title">核心指標</div>
+        <div class="metric-grid">
+          ${metricCell('下載速度', fmt(dl, 1), 'Mbps', rDl, `約每秒 ${fmt(dl / 8, 1)} MB`)}
+          ${metricCell('上傳速度', fmt(ul, 1), 'Mbps', rUl, `約每秒 ${fmt(ul / 8, 1)} MB`)}
+          ${metricCell('延遲 Ping', fmt(lat, 0), 'ms', rLat, '閒置時的來回反應時間')}
+          ${metricCell('抖動 Jitter', fmt(jit, 1), 'ms', rJit, '延遲的穩定程度')}
+          ${metricCell('封包遺失', fmt(loss, 1), '%', rLoss, '資料傳輸的可靠度')}
+          ${metricCell('負載延遲', fmt(worstLoaded, 0), 'ms', rLoad, '滿載時的最高延遲')}
+        </div>
+      </div>`;
+    }
 
-      // 顯示正在處理的提示
-      const processingMsg = document.createElement('div');
-      processingMsg.textContent = '正在生成圖片...';
-      processingMsg.style.textAlign = 'center';
-      processingMsg.style.margin = '20px 0';
-      processingMsg.style.fontWeight = 'bold';
-      resultEl.appendChild(processingMsg);
+    function benchBar(label, you, ref, cap, unit) {
+      const max = Math.max(you, ref.tw, ref.global, cap * 0.4);
+      const w = v => Math.min(100, (v / max) * 100).toFixed(1) + '%';
+      const youR = you >= ref.tw ? 'good' : you >= ref.global ? 'warn' : 'poor';
+      return `
+      <div class="bench-row">
+        <div class="bench-head"><span class="name">${label}</span>
+          <span class="t-${youR}" style="font-weight:700">${fmt(you, 1)} ${unit}</span></div>
+        <div class="bench-track">
+          <div class="bar-line"><span class="who you">您的網路</span>
+            <div class="bar-box"><div class="bar-fill you" data-w="${w(you)}" style="width:0"></div></div>
+            <span class="val you">${fmt(you, 0)}</span></div>
+          <div class="bar-line"><span class="who">台灣平均</span>
+            <div class="bar-box"><div class="bar-fill ref" data-w="${w(ref.tw)}" style="width:0"></div></div>
+            <span class="val">${ref.tw}</span></div>
+          <div class="bar-line"><span class="who">全球平均</span>
+            <div class="bar-box"><div class="bar-fill ref" data-w="${w(ref.global)}" style="width:0"></div></div>
+            <span class="val">${ref.global}</span></div>
+        </div>
+      </div>`;
+    }
+    function benchCard(dl, ul) {
+      return `
+      <div class="section">
+        <div class="section-title">與市場平均比較</div>
+        <div class="card">
+          ${benchBar('下載速度', dl, BENCH.download, 500, 'Mbps')}
+          ${benchBar('上傳速度', ul, BENCH.upload, 300, 'Mbps')}
+          <div class="bench-note">
+            ※「台灣平均／全球平均」為業界典型參考值（概念參照 Ookla Speedtest Global Index 固網中位級距），
+            供相對定位使用，非即時官方數據。高於台灣平均代表您的頻寬在本地屬中上水準。
+          </div>
+        </div>
+      </div>`;
+    }
 
-      // 生成圖片
-      html2canvas(resultEl, {
-        backgroundColor: '#f8f9fa',
-        scale: 2, // 提高圖片質量
-        logging: false,
-        onclone: (clonedDoc) => {
-          // 在克隆的文檔中也隱藏按鈕
-          const clonedButtons = clonedDoc.querySelector('.action-buttons');
-          if (clonedButtons) clonedButtons.style.display = 'none';
+    function bufferbloatCard(lat, dLat, uLat, bloat) {
+      let grade, gcls, gtext, gbg;
+      if (bloat <= BENCH.bufferbloat.good) { grade = 'A'; gcls = 'good'; gbg = 'rgba(34,197,94,.16)'; gtext = '優異，負載下依然穩定，多人同時使用不打架。'; }
+      else if (bloat <= BENCH.bufferbloat.avg) { grade = 'B'; gcls = 'good'; gbg = 'rgba(34,197,94,.14)'; gtext = '良好，滿載時延遲僅小幅上升。'; }
+      else if (bloat <= BENCH.bufferbloat.poor) { grade = 'C'; gcls = 'warn'; gbg = 'rgba(245,158,11,.16)'; gtext = '中度膨脹，多人使用時互動類應用會偶爾卡頓。'; }
+      else { grade = 'D'; gcls = 'poor'; gbg = 'rgba(239,68,68,.16)'; gtext = '嚴重膨脹，只要有人下載／上傳，全家連線就明顯變慢。'; }
+      return `
+      <div class="section">
+        <div class="section-title">Bufferbloat 負載延遲分析</div>
+        <div class="card">
+          <div class="bloat-grid">
+            <div class="bloat-cell"><div class="lab">閒置延遲</div><div class="num">${fmt(lat, 0)}<small> ms</small></div></div>
+            <div class="bloat-cell"><div class="lab">下載時延遲</div><div class="num t-${gcls}">${fmt(dLat, 0)}<small> ms</small></div></div>
+            <div class="bloat-cell"><div class="lab">上傳時延遲</div><div class="num t-${gcls}">${fmt(uLat, 0)}<small> ms</small></div></div>
+          </div>
+          <div class="bloat-grade">
+            <span class="grade-badge t-${gcls}" style="background:${gbg}">${grade}</span>
+            負載延遲增量 <b class="t-${gcls}">+${fmt(bloat, 0)} ms</b> · ${gtext}
+          </div>
+        </div>
+      </div>`;
+    }
 
-          // 刪除克隆文檔中的處理信息
-          const clonedMsg = clonedDoc.querySelector('#result > div:last-child');
-          if (clonedMsg && clonedMsg.textContent === '正在生成圖片...') {
-            clonedMsg.remove();
-          }
-        }
-      }).then(canvas => {
-        // 移除處理提示
-        processingMsg.remove();
+    function diagnosisCard(diag) {
+      if (!diag.length) {
+        return `
+        <div class="section">
+          <div class="section-title">診斷報告</div>
+          <div class="diag good">
+            <div class="ico">✅</div>
+            <div class="body"><h4>一切正常，沒有偵測到瓶頸</h4>
+              <p>下載、上傳、延遲、抖動、丟包與 Bufferbloat 全數落在健康區間，這是一條體質很好的線路。</p>
+              <div class="fix">維持建議：定期重開機路由器、韌體更新至最新版即可長期穩定。</div></div>
+          </div>
+        </div>`;
+      }
+      const rows = diag.map(d => `
+        <div class="diag ${d.sev}">
+          <div class="ico">${d.ico}</div>
+          <div class="body">
+            <h4>${d.title}</h4>
+            <p>${d.detail}</p>
+            <div class="fix">💡 建議：${d.fix}</div>
+          </div>
+        </div>`).join('');
+      return `
+      <div class="section">
+        <div class="section-title">診斷報告 · 依嚴重度排序</div>
+        ${rows}
+      </div>`;
+    }
 
-        // 顯示按鈕
-        actionButtons.style.display = originalDisplay;
+    function useCaseCard({ dl, ul, lat, jit, loss, bloat }) {
+      const cases = [
+        { emoji: '🎬', name: '4K 高畫質串流', ok: dl >= 25 && loss < 2, warn: dl >= 15 },
+        { emoji: '💼', name: '視訊會議', ok: ul >= 5 && jit < 30 && loss < 2 && bloat < 100, warn: ul >= 3 && loss < 4 },
+        { emoji: '🎮', name: '競技線上遊戲', ok: lat < 50 && jit < 20 && loss < 1 && bloat < 80, warn: lat < 90 && loss < 2 },
+        { emoji: '☁️', name: '雲端遊戲串流', ok: dl >= 25 && lat < 40 && bloat < 60, warn: dl >= 15 && lat < 70 },
+        { emoji: '📤', name: '大檔上傳／備份', ok: ul >= 25, warn: ul >= 10 },
+        { emoji: '👨‍👩‍👧', name: '多人同時使用', ok: dl >= 100 && bloat < 60, warn: dl >= 50 && bloat < 150 },
+      ];
+      const cells = cases.map(c => {
+        const st = c.ok ? { t: '順暢', cls: 'good' } : c.warn ? { t: '勉強可用', cls: 'warn' } : { t: '不建議', cls: 'poor' };
+        return `<div class="uc"><div class="emoji">${c.emoji}</div>
+          <div><div class="uc-name">${c.name}</div>
+          <div class="uc-status t-${st.cls}">${st.t}</div></div></div>`;
+      }).join('');
+      return `
+      <div class="section">
+        <div class="section-title">使用情境評估</div>
+        <div class="uc-grid">${cells}</div>
+      </div>`;
+    }
 
-        // 獲取當前日期
+    function drawRing(score) {
+      const ring = $('ringFill');
+      if (!ring) return;
+      const C = 2 * Math.PI * 54; // 339.29
+      const len = (Math.max(0, Math.min(100, score)) / 100) * C;
+      ring.style.transition = 'stroke-dasharray 1.1s cubic-bezier(.2,.8,.2,1)';
+      ring.setAttribute('transform', 'rotate(-90 63 63)');
+      requestAnimationFrame(() => ring.setAttribute('stroke-dasharray', `${len.toFixed(1)} ${C.toFixed(1)}`));
+    }
+
+    /* ---- save image ---- */
+    async function saveImage() {
+      const btn = $('saveBtn');
+      const orig = btn.innerHTML;
+      btn.innerHTML = '產生圖片中…';
+      btn.disabled = true;
+      const actionsBars = document.querySelectorAll('.actions');
+      actionsBars.forEach(a => a.style.visibility = 'hidden');
+      try {
+        const canvas = await html2canvas($('capture-root'), {
+          backgroundColor: '#070b16', scale: 2, logging: false,
+          windowWidth: document.documentElement.scrollWidth
+        });
         const now = new Date();
-        const dateStr = now.toISOString().split('T')[0];
-        const timestamp = now.toLocaleTimeString('en-GB', { hour12: false }).replace(/:/g, '-');
-
-        // 使用更通用的檔名，避免使用錯誤的網路名稱
-        const filename = `SpeedTest_Result_${dateStr}_${timestamp}.jpg`;
-
-        // 轉換為圖片並下載
+        const stamp = now.toISOString().slice(0, 16).replace('T', '_').replace(':', '-');
         const link = document.createElement('a');
-        link.download = filename;
-        // 指定使用 jpeg 格式，品質 0.9
-        link.href = canvas.toDataURL('image/jpeg', 0.9);
+        link.download = `蓋斯克測速報告_${stamp}.jpg`;
+        link.href = canvas.toDataURL('image/jpeg', 0.92);
         link.click();
-      }).catch(err => {
-        console.error('生成圖片時出錯：', err);
-
-        // 移除處理提示
-        processingMsg.remove();
-
-        // 顯示按鈕
-        actionButtons.style.display = originalDisplay;
-
-        // 顯示錯誤信息
-        const errorMsg = document.createElement('div');
-        errorMsg.textContent = '無法生成圖片，請稍後再試。';
-        errorMsg.style.color = 'red';
-        errorMsg.style.textAlign = 'center';
-        errorMsg.style.margin = '20px 0';
-
-        // 5秒後移除錯誤信息
-        setTimeout(() => errorMsg.remove(), 5000);
-
-        resultEl.appendChild(errorMsg);
-      });
-    }
-
-    function addMetric(container, name, value, ratingClass) {
-      const metric = document.createElement('div');
-      metric.className = 'metric';
-
-      const metricName = document.createElement('div');
-      metricName.className = 'metric-name';
-      metricName.textContent = name;
-
-      const metricValue = document.createElement('div');
-      metricValue.className = 'metric-value ' + ratingClass;
-      metricValue.textContent = value;
-
-      metric.appendChild(metricName);
-      metric.appendChild(metricValue);
-      container.appendChild(metric);
-    }
-
-    function addDetail(container, text) {
-      const detail = document.createElement('div');
-      detail.className = 'detail';
-      detail.textContent = text;
-      detail.style.paddingLeft = '20px';
-      detail.style.fontSize = '14px';
-      detail.style.color = '#666';
-      container.appendChild(detail);
-    }
-
-    function addListItem(list, text) {
-      const item = document.createElement('li');
-      item.textContent = text;
-      list.appendChild(item);
-    }
-
-    function getRatingClass(value, warningThreshold, goodThreshold) {
-      if (value <= 0) return 'poor';
-      if (value < warningThreshold) return 'poor';
-      if (value < goodThreshold) return 'warning';
-      return 'good';
-    }
-
-    // 添加WiFi資訊表格行的函數
-    function addWifiInfoRow(table, label, value) {
-      const row = document.createElement('tr');
-
-      const labelCell = document.createElement('td');
-      labelCell.textContent = label;
-
-      const valueCell = document.createElement('td');
-      valueCell.textContent = value;
-
-      row.appendChild(labelCell);
-      row.appendChild(valueCell);
-      table.appendChild(row);
+      } catch (e) {
+        console.error(e);
+        alert('圖片產生失敗，請稍後再試。');
+      } finally {
+        actionsBars.forEach(a => a.style.visibility = '');
+        btn.innerHTML = orig;
+        btn.disabled = false;
+        $('saveBtn').addEventListener('click', saveImage);
+      }
     }
   </script>
 </body>
