@@ -51,8 +51,51 @@
     }
     .brand { display: flex; align-items: center; gap: 14px; }
     .brand-logo { height: 52px; width: auto; display: block; }
-    .brand-sub { font-size: 17px; color: var(--muted); font-weight: 500;
-      padding-left: 14px; border-left: 1px solid var(--border-strong); }
+
+    /* ---------- Connection status card ---------- */
+    .conn-card {
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      background: linear-gradient(135deg, rgba(59,130,246,.06), rgba(255,255,255,.02));
+      border: 1px solid var(--border-strong); border-left: 4px solid var(--muted-2);
+      border-radius: 16px; padding: 16px 20px; margin-bottom: 20px; flex-wrap: wrap;
+      transition: border-color .4s, background .4s;
+    }
+    .conn-card.good { border-color: rgba(34,197,94,.28); border-left-color: var(--good);
+      background: linear-gradient(135deg, rgba(34,197,94,.07), rgba(255,255,255,.02)); }
+    .conn-card.warn { border-color: rgba(245,158,11,.3); border-left-color: var(--warn);
+      background: linear-gradient(135deg, rgba(245,158,11,.07), rgba(255,255,255,.02)); }
+    .conn-card.poor { border-color: rgba(239,68,68,.3); border-left-color: var(--poor);
+      background: linear-gradient(135deg, rgba(239,68,68,.07), rgba(255,255,255,.02)); }
+    .conn-left { min-width: 0; flex: 1; }
+    .conn-name { font-size: 22px; font-weight: 800; letter-spacing: .2px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .conn-sub { font-size: 16px; color: var(--muted); margin-top: 2px; }
+    .conn-stats { font-size: 15px; color: var(--muted-2); margin-top: 8px; display: flex;
+      flex-wrap: wrap; gap: 6px 16px; }
+    .conn-stats .cs { display: inline-flex; align-items: center; gap: 6px; }
+    .conn-stats .cs b { color: var(--text); font-weight: 700; }
+    .conn-right { text-align: right; min-width: 180px; }
+    .conn-meta { font-size: 16px; color: var(--muted); font-weight: 600; margin-bottom: 8px; }
+    .conn-meta b { color: var(--text); font-weight: 800; }
+    .conn-score { display: flex; align-items: center; gap: 10px; justify-content: flex-end; }
+    .conn-bar { flex: 1; max-width: 130px; height: 10px; background: rgba(255,255,255,.08);
+      border-radius: 999px; overflow: hidden; }
+    .conn-bar-fill { height: 100%; width: 0; border-radius: 999px;
+      background: linear-gradient(90deg, var(--brand), var(--good)); transition: width 1s cubic-bezier(.2,.8,.2,1); }
+    .conn-score-num { font-size: 22px; font-weight: 850; font-variant-numeric: tabular-nums; min-width: 62px; }
+
+    /* ---------- Live throughput chart ---------- */
+    .chart-panel { margin-top: 22px; }
+    .chart-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .chart-title { font-size: 16px; font-weight: 700; color: var(--muted); letter-spacing: 1px; }
+    .chart-legend { display: flex; gap: 16px; font-size: 15px; color: var(--muted); }
+    .chart-legend .lg { display: inline-flex; align-items: center; gap: 6px; }
+    .chart-legend i { width: 14px; height: 4px; border-radius: 2px; display: inline-block; }
+    .chart-legend .lg-dl { background: var(--brand); }
+    .chart-legend .lg-ul { background: var(--accent); }
+    #liveChart { width: 100%; height: 150px; display: block;
+      background: rgba(255,255,255,.02); border: 1px solid var(--border); border-radius: 14px; }
+    .chart-note { font-size: 14px; color: var(--muted-2); margin-top: 8px; text-align: center; }
     .badge-pill {
       font-size: 17px; color: var(--muted); border: 1px solid var(--border);
       background: var(--surface); padding: 6px 12px; border-radius: 999px;
@@ -256,8 +299,10 @@
 
     @media (max-width: 560px) {
       .topbar { flex-wrap: wrap; gap: 12px; }
-      .brand-sub { display: none; }
       .brand-logo { height: 42px; }
+      .conn-right { text-align: left; min-width: 100%; }
+      .conn-score { justify-content: flex-start; }
+      .conn-bar { max-width: none; }
       .live-chips { grid-template-columns: repeat(2, 1fr); }
       .metric-grid { grid-template-columns: 1fr; }
       .bloat-grid { grid-template-columns: 1fr; }
@@ -272,7 +317,6 @@
     <div class="topbar">
       <div class="brand">
         <img class="brand-logo" src="logo.png" alt="ZONE TECH 蓋斯克科技" width="651" height="181">
-        <span class="brand-sub">Network Diagnostics</span>
       </div>
       <div class="badge-pill"><span class="dot"></span> Cloudflare 全球節點</div>
     </div>
@@ -280,6 +324,22 @@
     <div class="hero">
       <h1>網路速度與健康診斷</h1>
       <p>一次測出下載、上傳、延遲、抖動、丟包與 Bufferbloat，並對照台灣與全球平均，指出您的網路瓶頸。</p>
+    </div>
+
+    <!-- 目前連線狀態 -->
+    <div class="conn-card" id="connCard">
+      <div class="conn-left">
+        <div class="conn-name" id="connName">偵測連線中…</div>
+        <div class="conn-sub" id="connSub">正在取得您的網路資訊</div>
+        <div class="conn-stats" id="connStats"></div>
+      </div>
+      <div class="conn-right">
+        <div class="conn-meta" id="connMeta">尚未測速</div>
+        <div class="conn-score">
+          <div class="conn-bar"><div class="conn-bar-fill" id="connBarFill"></div></div>
+          <div class="conn-score-num" id="connScoreNum">—</div>
+        </div>
+      </div>
     </div>
 
     <div class="stage">
@@ -313,6 +373,18 @@
           <div class="chip" id="chip-latency"><div class="k">延遲</div><div class="v" id="lv-latency">—</div><div class="u">ms</div></div>
           <div class="chip" id="chip-jitter"><div class="k">抖動</div><div class="v" id="lv-jitter">—</div><div class="u">ms</div></div>
         </div>
+      </div>
+
+      <div class="chart-panel" id="chartPanel">
+        <div class="chart-head">
+          <span class="chart-title">即時速度曲線</span>
+          <span class="chart-legend">
+            <span class="lg"><i class="lg-dl"></i>下載</span>
+            <span class="lg"><i class="lg-ul"></i>上傳</span>
+          </span>
+        </div>
+        <canvas id="liveChart" height="150"></canvas>
+        <div class="chart-note">曲線越平穩＝連線越穩定；起伏越大代表抖動（Jitter）越高。</div>
       </div>
 
       <div class="actions">
@@ -374,6 +446,110 @@
     let live = { download: 0, upload: 0, latency: 0, jitter: 0 };
     let animTimer = null;
 
+    /* ---- connection status card (real browser + Cloudflare meta data) ---- */
+    const connCard = $('connCard');
+    function setConnClass(cls) {
+      connCard.classList.remove('good', 'warn', 'poor');
+      if (['good', 'warn', 'poor'].includes(cls)) connCard.classList.add(cls);
+    }
+    function browserConnType() {
+      const c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+      if (!c) return '';
+      const map = { wifi: 'Wi‑Fi', cellular: '行動網路', ethernet: '有線', wimax: 'WiMAX', bluetooth: '藍牙', other: '其他', none: '離線' };
+      if (c.type && map[c.type]) return map[c.type];
+      if (c.effectiveType) return c.effectiveType.toUpperCase();
+      return '';
+    }
+    async function loadConnInfo() {
+      const typeStr = browserConnType();
+      try {
+        const meta = await fetch('https://speed.cloudflare.com/meta', { cache: 'no-store' }).then(r => r.json());
+        $('connName').textContent = meta.asOrganization || '未知網路服務商';
+        const asn = meta.asn ? `AS${meta.asn}` : '';
+        $('connSub').textContent = [asn, meta.clientIp].filter(Boolean).join(' · ') || '已連線';
+        const loc = [meta.city, meta.country].filter(Boolean).join(', ');
+        const stats = [];
+        if (loc) stats.push(`<span class="cs">位置 <b>${loc}</b></span>`);
+        if (meta.colo) stats.push(`<span class="cs">Cloudflare 節點 <b>${meta.colo}</b></span>`);
+        if (typeStr) stats.push(`<span class="cs">連線 <b>${typeStr}</b></span>`);
+        if (meta.httpProtocol) stats.push(`<span class="cs">協定 <b>${meta.httpProtocol}</b></span>`);
+        $('connStats').innerHTML = stats.join('');
+      } catch (e) {
+        $('connName').textContent = '已連線';
+        $('connSub').textContent = typeStr ? ('連線類型：' + typeStr) : '無法取得詳細網路資訊';
+        $('connStats').innerHTML = '';
+      }
+    }
+    function updateConnResult(dl, lat, overall) {
+      $('connMeta').innerHTML = `下載 <b>${fmt(dl, 0)}</b> Mbps · Ping <b>${fmt(lat, 0)}</b> ms`;
+      const sc = Math.round(overall.score);
+      const num = $('connScoreNum');
+      num.textContent = sc + '/100';
+      num.className = 'conn-score-num t-' + overall.cls;
+      $('connBarFill').style.width = Math.max(4, sc) + '%';
+      setConnClass(overall.cls);
+    }
+    loadConnInfo();
+
+    /* ---- live throughput chart (real per-measurement bandwidth points) ---- */
+    const chartCanvas = $('liveChart');
+    const chartCtx = chartCanvas.getContext('2d');
+    let chartData = { download: [], upload: [] };
+
+    function extractPoints(fn) {
+      try {
+        return (fn() || [])
+          .filter(p => p && p.bps > 0)
+          .sort((a, b) => (a.measTime || 0) - (b.measTime || 0))
+          .map(p => p.bps / 1e6);
+      } catch (e) { return []; }
+    }
+    function resizeChart() {
+      const dpr = window.devicePixelRatio || 1;
+      const cssW = chartCanvas.clientWidth || 600;
+      chartCanvas.width = Math.round(cssW * dpr);
+      chartCanvas.height = Math.round(150 * dpr);
+      chartCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      drawChart();
+    }
+    function drawChart() {
+      const ctx = chartCtx, w = chartCanvas.clientWidth || 600, h = 150;
+      ctx.clearRect(0, 0, w, h);
+      const pad = { l: 46, r: 12, t: 14, b: 8 };
+      const plotW = w - pad.l - pad.r, plotH = h - pad.t - pad.b;
+      const dl = chartData.download, ul = chartData.upload, all = dl.concat(ul);
+      const maxV = Math.max(10, ...all) * 1.15;
+      ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+      ctx.fillStyle = 'rgba(147,161,192,0.75)';
+      ctx.font = '12px -apple-system, sans-serif';
+      ctx.textAlign = 'right'; ctx.textBaseline = 'middle'; ctx.lineWidth = 1;
+      for (let i = 0; i <= 3; i++) {
+        const y = pad.t + plotH * (i / 3);
+        ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(w - pad.r, y); ctx.stroke();
+        ctx.fillText(Math.round(maxV * (1 - i / 3)) + '', pad.l - 8, y);
+      }
+      const n = Math.max(1, all.length - 1);
+      const xAt = i => pad.l + plotW * (i / n);
+      const yAt = v => pad.t + plotH * (1 - Math.min(1, v / maxV));
+      function drawSeries(series, offset, color, fill) {
+        if (!series.length) return;
+        ctx.beginPath();
+        series.forEach((v, i) => { const x = xAt(offset + i), y = yAt(v); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
+        ctx.strokeStyle = color; ctx.lineWidth = 2.5; ctx.lineJoin = 'round'; ctx.stroke();
+        const grad = ctx.createLinearGradient(0, pad.t, 0, pad.t + plotH);
+        grad.addColorStop(0, fill); grad.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.lineTo(xAt(offset + series.length - 1), pad.t + plotH);
+        ctx.lineTo(xAt(offset), pad.t + plotH);
+        ctx.closePath(); ctx.fillStyle = grad; ctx.fill();
+        const lx = xAt(offset + series.length - 1), ly = yAt(series[series.length - 1]);
+        ctx.beginPath(); ctx.arc(lx, ly, 4, 0, Math.PI * 2); ctx.fillStyle = color; ctx.fill();
+      }
+      drawSeries(dl, 0, '#3b82f6', 'rgba(59,130,246,0.28)');
+      drawSeries(ul, dl.length, '#8b5cf6', 'rgba(139,92,246,0.28)');
+    }
+    function resetChart() { chartData = { download: [], upload: [] }; drawChart(); }
+    window.addEventListener('resize', resizeChart);
+
     /* ---- gauge helpers ---- */
     // sqrt scale up to 1000 Mbps gives pleasant spread
     function speedToFrac(mbps) { return Math.max(0, Math.min(1, Math.sqrt(mbps / 1000))); }
@@ -413,6 +589,8 @@
       gaugeValue.innerHTML = '0';
       gaugePhase.textContent = '初始化';
       gaugeUnit.textContent = '連線至最近節點…';
+      resetChart();
+      $('connMeta').textContent = '測速進行中…';
     }
 
     function startTest() {
@@ -438,6 +616,8 @@
           gaugeValue.innerHTML = fmt(live.download, 1);
           gaugeUnit.textContent = 'Mbps 下載';
           setRow('download', 'doing');
+          chartData.download = extractPoints(() => engine.results.getDownloadBandwidthPoints());
+          drawChart();
         } else if (type === 'upload' && s.upload) {
           live.upload = s.upload / 1e6;
           gaugePhase.textContent = '上傳測試';
@@ -448,6 +628,9 @@
           gaugeUnit.textContent = 'Mbps 上傳';
           setRow('download', 'done', fmt(live.download, 1) + ' Mbps');
           setRow('upload', 'doing');
+          chartData.download = extractPoints(() => engine.results.getDownloadBandwidthPoints());
+          chartData.upload = extractPoints(() => engine.results.getUploadBandwidthPoints());
+          drawChart();
         } else if (type === 'latency') {
           if (s.latency) { live.latency = s.latency; setChip('latency', fmt(s.latency, 0)); }
           if (s.jitter) { live.jitter = s.jitter; setChip('jitter', fmt(s.jitter, 1)); }
@@ -492,6 +675,7 @@
     }
 
     startBtn.addEventListener('click', startTest);
+    resizeChart();
 
     /* =========================================================
        結果分析
@@ -522,6 +706,7 @@
 
       const diag = analyze({ dl, ul, lat, jit, loss, bloat, dLat, uLat });
       const overall = scoreOverall({ dl, ul, lat, jit, loss, bloat });
+      updateConnResult(dl, lat, overall);
 
       const html = `
         ${verdictCard(overall, diag)}
