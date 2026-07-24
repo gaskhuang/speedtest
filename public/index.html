@@ -52,38 +52,6 @@
     .brand { display: flex; align-items: center; gap: 14px; }
     .brand-logo { height: 52px; width: auto; display: block; }
 
-    /* ---------- Connection status card ---------- */
-    .conn-card {
-      display: flex; align-items: center; justify-content: space-between; gap: 16px;
-      background: linear-gradient(135deg, rgba(59,130,246,.06), rgba(255,255,255,.02));
-      border: 1px solid var(--border-strong); border-left: 4px solid var(--muted-2);
-      border-radius: 16px; padding: 16px 20px; margin-bottom: 20px; flex-wrap: wrap;
-      transition: border-color .4s, background .4s;
-    }
-    .conn-card.good { border-color: rgba(34,197,94,.28); border-left-color: var(--good);
-      background: linear-gradient(135deg, rgba(34,197,94,.07), rgba(255,255,255,.02)); }
-    .conn-card.warn { border-color: rgba(245,158,11,.3); border-left-color: var(--warn);
-      background: linear-gradient(135deg, rgba(245,158,11,.07), rgba(255,255,255,.02)); }
-    .conn-card.poor { border-color: rgba(239,68,68,.3); border-left-color: var(--poor);
-      background: linear-gradient(135deg, rgba(239,68,68,.07), rgba(255,255,255,.02)); }
-    .conn-left { min-width: 0; flex: 1; }
-    .conn-name { font-size: 22px; font-weight: 800; letter-spacing: .2px;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .conn-sub { font-size: 16px; color: var(--muted); margin-top: 2px; }
-    .conn-stats { font-size: 15px; color: var(--muted-2); margin-top: 8px; display: flex;
-      flex-wrap: wrap; gap: 6px 16px; }
-    .conn-stats .cs { display: inline-flex; align-items: center; gap: 6px; }
-    .conn-stats .cs b { color: var(--text); font-weight: 700; }
-    .conn-right { text-align: right; min-width: 180px; }
-    .conn-meta { font-size: 16px; color: var(--muted); font-weight: 600; margin-bottom: 8px; }
-    .conn-meta b { color: var(--text); font-weight: 800; }
-    .conn-score { display: flex; align-items: center; gap: 10px; justify-content: flex-end; }
-    .conn-bar { flex: 1; max-width: 130px; height: 10px; background: rgba(255,255,255,.08);
-      border-radius: 999px; overflow: hidden; }
-    .conn-bar-fill { height: 100%; width: 0; border-radius: 999px;
-      background: linear-gradient(90deg, var(--brand), var(--good)); transition: width 1s cubic-bezier(.2,.8,.2,1); }
-    .conn-score-num { font-size: 22px; font-weight: 850; font-variant-numeric: tabular-nums; min-width: 62px; }
-
     /* ---------- Live throughput chart ---------- */
     .chart-panel { margin-top: 22px; }
     .chart-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
@@ -300,9 +268,6 @@
     @media (max-width: 560px) {
       .topbar { flex-wrap: wrap; gap: 12px; }
       .brand-logo { height: 42px; }
-      .conn-right { text-align: left; min-width: 100%; }
-      .conn-score { justify-content: flex-start; }
-      .conn-bar { max-width: none; }
       .live-chips { grid-template-columns: repeat(2, 1fr); }
       .metric-grid { grid-template-columns: 1fr; }
       .bloat-grid { grid-template-columns: 1fr; }
@@ -324,22 +289,6 @@
     <div class="hero">
       <h1>網路速度與健康診斷</h1>
       <p>一次測出下載、上傳、延遲、抖動、丟包與 Bufferbloat，並對照台灣與全球平均，指出您的網路瓶頸。</p>
-    </div>
-
-    <!-- 目前連線狀態 -->
-    <div class="conn-card" id="connCard">
-      <div class="conn-left">
-        <div class="conn-name" id="connName">偵測連線中…</div>
-        <div class="conn-sub" id="connSub">正在取得您的網路資訊</div>
-        <div class="conn-stats" id="connStats"></div>
-      </div>
-      <div class="conn-right">
-        <div class="conn-meta" id="connMeta">尚未測速</div>
-        <div class="conn-score">
-          <div class="conn-bar"><div class="conn-bar-fill" id="connBarFill"></div></div>
-          <div class="conn-score-num" id="connScoreNum">—</div>
-        </div>
-      </div>
     </div>
 
     <div class="stage">
@@ -446,51 +395,6 @@
     let live = { download: 0, upload: 0, latency: 0, jitter: 0 };
     let animTimer = null;
 
-    /* ---- connection status card (real browser + Cloudflare meta data) ---- */
-    const connCard = $('connCard');
-    function setConnClass(cls) {
-      connCard.classList.remove('good', 'warn', 'poor');
-      if (['good', 'warn', 'poor'].includes(cls)) connCard.classList.add(cls);
-    }
-    function browserConnType() {
-      const c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-      if (!c) return '';
-      const map = { wifi: 'Wi‑Fi', cellular: '行動網路', ethernet: '有線', wimax: 'WiMAX', bluetooth: '藍牙', other: '其他', none: '離線' };
-      if (c.type && map[c.type]) return map[c.type];
-      if (c.effectiveType) return c.effectiveType.toUpperCase();
-      return '';
-    }
-    async function loadConnInfo() {
-      const typeStr = browserConnType();
-      try {
-        const meta = await fetch('https://speed.cloudflare.com/meta', { cache: 'no-store' }).then(r => r.json());
-        $('connName').textContent = meta.asOrganization || '未知網路服務商';
-        const asn = meta.asn ? `AS${meta.asn}` : '';
-        $('connSub').textContent = [asn, meta.clientIp].filter(Boolean).join(' · ') || '已連線';
-        const loc = [meta.city, meta.country].filter(Boolean).join(', ');
-        const stats = [];
-        if (loc) stats.push(`<span class="cs">位置 <b>${loc}</b></span>`);
-        if (meta.colo) stats.push(`<span class="cs">Cloudflare 節點 <b>${meta.colo}</b></span>`);
-        if (typeStr) stats.push(`<span class="cs">連線 <b>${typeStr}</b></span>`);
-        if (meta.httpProtocol) stats.push(`<span class="cs">協定 <b>${meta.httpProtocol}</b></span>`);
-        $('connStats').innerHTML = stats.join('');
-      } catch (e) {
-        $('connName').textContent = '已連線';
-        $('connSub').textContent = typeStr ? ('連線類型：' + typeStr) : '無法取得詳細網路資訊';
-        $('connStats').innerHTML = '';
-      }
-    }
-    function updateConnResult(dl, lat, overall) {
-      $('connMeta').innerHTML = `下載 <b>${fmt(dl, 0)}</b> Mbps · Ping <b>${fmt(lat, 0)}</b> ms`;
-      const sc = Math.round(overall.score);
-      const num = $('connScoreNum');
-      num.textContent = sc + '/100';
-      num.className = 'conn-score-num t-' + overall.cls;
-      $('connBarFill').style.width = Math.max(4, sc) + '%';
-      setConnClass(overall.cls);
-    }
-    loadConnInfo();
-
     /* ---- live throughput chart (real per-measurement bandwidth points) ---- */
     const chartCanvas = $('liveChart');
     const chartCtx = chartCanvas.getContext('2d');
@@ -590,7 +494,6 @@
       gaugePhase.textContent = '初始化';
       gaugeUnit.textContent = '連線至最近節點…';
       resetChart();
-      $('connMeta').textContent = '測速進行中…';
     }
 
     function startTest() {
@@ -706,7 +609,6 @@
 
       const diag = analyze({ dl, ul, lat, jit, loss, bloat, dLat, uLat });
       const overall = scoreOverall({ dl, ul, lat, jit, loss, bloat });
-      updateConnResult(dl, lat, overall);
 
       const html = `
         ${verdictCard(overall, diag)}
