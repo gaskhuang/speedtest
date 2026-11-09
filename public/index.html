@@ -281,6 +281,65 @@
     .foot { text-align: center; margin-top: 26px; color: var(--muted-2); font-size: 17px; }
     .foot a { color: var(--muted); text-decoration: none; }
 
+    /* wifi site analysis */
+    .site-q { display: flex; flex-direction: column; gap: 18px; }
+    .site-q-head { font-size: 19px; font-weight: 800; }
+    .site-q-head span { font-size: 16px; font-weight: 500; color: var(--muted-2); margin-left: 4px; }
+    .q-label { font-size: 19px; font-weight: 700; margin-bottom: 9px; }
+    .q-hint { font-size: 16px; font-weight: 500; color: var(--muted-2); margin-left: 8px; white-space: nowrap; display: inline-block; }
+    .q-auto { font-size: 14px; font-weight: 700; color: var(--brand-2); margin-left: 8px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 10px; }
+    .chip-btn { font: inherit; font-size: 18px; font-weight: 600; color: var(--text); cursor: pointer;
+      background: var(--surface-2); border: 1.5px solid var(--border-strong); border-radius: 999px;
+      padding: 9px 18px; min-height: 48px; touch-action: manipulation; }
+    .chip-btn[aria-checked="true"] { background: rgba(59,130,246,.24); border-color: var(--brand); color: #fff; }
+    .chip-btn[aria-checked="true"]::before { content: "✓ "; color: var(--brand-2); }
+    .wifi-summary { margin-top: 14px; padding: 18px 20px; border-radius: var(--radius); border: 1px solid var(--border-strong);
+      background: linear-gradient(135deg, rgba(59,130,246,.10), rgba(139,92,246,.08)); border-left-width: 5px; }
+    .ws-good { border-left-color: var(--good); } .ws-warn { border-left-color: var(--warn); } .ws-poor { border-left-color: var(--poor); }
+    .ws-label { font-size: 15px; font-weight: 700; color: #c7d6ff; }
+    .ws-head { font-size: 21px; margin-top: 4px; }
+    .ws-head b, .ws-more b { color: #fff; }
+    .ws-more { margin-top: 8px; font-size: 18px; color: var(--muted); list-style: none; }
+    .ws-more li { padding-left: 20px; position: relative; margin-top: 4px; }
+    .ws-more li::before { content: ""; position: absolute; left: 3px; top: .62em; width: 9px; height: 9px; border-radius: 50%; background: var(--muted); }
+    .ws-more .t-good-dot::before { background: var(--good); } .ws-more .t-warn-dot::before { background: var(--warn); } .ws-more .t-poor-dot::before { background: var(--poor); }
+    .ws-note { font-size: 16px; color: var(--muted-2); margin-top: 8px; }
+    .wf-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 14px; }
+    .wf { background: var(--surface); border: 1px solid var(--border); border-radius: 15px; padding: 16px; min-width: 0; }
+    .wf.wide { grid-column: 1 / -1; }
+    .wf-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .wf-name { font-size: 19px; font-weight: 800; }
+    .src { font-size: 14px; font-weight: 700; padding: 2px 9px; border-radius: 7px; white-space: nowrap; }
+    .src-meas { background: rgba(34,197,94,.14); color: #86efac; }
+    .src-infer { background: rgba(139,92,246,.2); color: #c4b5fd; }
+    .src-user { background: rgba(6,214,214,.14); color: #67e8f9; }
+    .wf-val { font-size: 28px; font-weight: 850; margin-top: 6px; line-height: 1.3; font-variant-numeric: tabular-nums; }
+    .wf-val small { font-size: 19px; font-weight: 700; }
+    .wf-desc { font-size: 17px; color: var(--muted); margin-top: 6px; }
+    .wf-foot { font-size: 15px; color: var(--muted-2); margin-top: 10px; line-height: 1.5; }
+    .ev { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
+    .ev span { font-size: 15px; padding: 3px 9px; border-radius: 8px; border: 1px solid var(--border); background: rgba(255,255,255,.04); color: var(--muted); }
+    .ev .ev-good { color: #86efac; border-color: rgba(34,197,94,.3); }
+    .ev .ev-warn { color: #fcd34d; border-color: rgba(245,158,11,.35); }
+    .ev .ev-poor { color: #fca5a5; border-color: rgba(239,68,68,.4); }
+    .ping-chart { margin-top: 12px; }
+    .ping-chart svg { width: 100%; height: auto; display: block; background: rgba(0,0,0,.18); border-radius: 10px; }
+    .ping-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 15px; color: var(--muted-2); margin-top: 8px; }
+    .ping-legend i { display: inline-block; width: 14px; height: 0; vertical-align: middle; margin-right: 6px; }
+    .lg-med { border-top: 2px dashed rgba(34,197,94,.8); }
+    .lg-spk { width: 10px !important; height: 10px !important; border-radius: 50%; background: #ef4444; }
+    .tier-list { list-style: none; display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+    .tier { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; font-size: 16px; padding: 8px 12px;
+      border-radius: 10px; color: var(--muted-2); background: rgba(255,255,255,.03); border: 1.5px solid transparent; }
+    .tier.on { background: rgba(59,130,246,.2); color: #fff; font-weight: 700; border-color: var(--brand); }
+    .tier.maybe { border-style: dashed; border-color: rgba(59,130,246,.35); }
+    .tier-range { font-variant-numeric: tabular-nums; }
+    .eng-hint { font-size: 17px; color: var(--muted); margin-bottom: 12px; }
+    .eng-text { white-space: pre-wrap; word-break: break-word; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 15px; line-height: 1.65; color: #cdd8f5; background: rgba(0,0,0,.25); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px; user-select: all; -webkit-user-select: all; }
+
     @media (max-width: 560px) {
       .wrap { padding: 14px 16px 60px; }
       .topbar { margin-bottom: 12px; gap: 8px; }
@@ -297,6 +356,9 @@
       .metric-grid { grid-template-columns: 1fr; }
       .bloat-grid { grid-template-columns: 1fr; }
       .uc-grid { grid-template-columns: repeat(2, 1fr); }
+      .wf-grid { grid-template-columns: 1fr; }
+      .chip-btn { font-size: 17px; padding: 8px 14px; }
+      .wf-val { font-size: 25px; }
       .bar-line { grid-template-columns: 96px 1fr 56px; }
       .verdict { justify-content: center; text-align: center; }
     }
@@ -447,7 +509,9 @@
       ['upload',   { type: 'upload', bytes: 1e6, count: 6 }],
       ['upload',   { type: 'upload', bytes: 1e7, count: 4 }],
       ['upload',   { type: 'upload', bytes: 25e6, count: 4 }],
-      ['upload',   { type: 'upload', bytes: 5e7, count: 3 }]
+      ['upload',   { type: 'upload', bytes: 5e7, count: 3 }],
+      // 測完再量一次閒置延遲：前後時段都有樣本，才看得出間歇性的頻道壅塞
+      ['upload',   { type: 'latency', numPackets: 10 }]
     ];
     const PHASE_OF = PLAN.map(p => p[0]);
     const SEG = { latency: [0, 0.12], download: [0.12, 0.56], upload: [0.56, 1] };
@@ -792,8 +856,13 @@
       el.gaugeUnit.textContent = 'Mbps 下載';
       setButton('again');
       run = null;
+      const raw = {
+        pings: results.getUnloadedLatencyPoints() || [],
+        dlPts: results.getDownloadBandwidthPoints() || [],
+        ulPts: results.getUploadBandwidthPoints() || []
+      };
       window.__lastSummary = { summary: s, l4, elapsed, errors: r.errors };
-      renderReport(s, l4);
+      renderReport(s, l4, raw);
     }
 
     function failRun(msg) {
@@ -862,7 +931,7 @@
     const pillClass = r => ({ good: 'pill-good', warn: 'pill-warn', poor: 'pill-poor' }[r] || 'pill-na');
     const pillText = r => ({ good: '良好', warn: '普通', poor: '偏弱' }[r] || '無資料');
 
-    function renderReport(s, l4) {
+    function renderReport(s, l4, raw) {
       const m = {
         dl: num(s.download) != null ? s.download / 1e6 : 0,
         ul: num(s.upload) != null ? s.upload / 1e6 : 0,
@@ -887,6 +956,8 @@
         ${bufferbloatCard(m)}
         ${diagnosisCard(diag)}
         ${useCaseCard(m)}
+        ${wifiSection()}
+        ${engineerSection()}
         ${methodCard()}
         <div class="actions" style="margin-top:26px">
           <button class="btn btn-primary" id="reBtn" type="button">
@@ -916,6 +987,7 @@
         startTest();
       });
       $('saveBtn').addEventListener('click', saveImage);
+      setupWifi(m, raw);
       el.results.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
@@ -1185,13 +1257,389 @@
       </div>`;
     }
 
+    /* =========================================================
+       無線網路現場分析
+       瀏覽器拿不到 WiFi 訊號強度、天線數、附近網路清單，
+       所以分三種來源：實測（ping）、推估（從測速數據反推）、客戶回報（點選）。
+       ========================================================= */
+    const SITE = { conn: null, connAuto: false, plan: null, wifiCount: null, distance: null };
+    (function detectConn() {
+      // 只有 Android Chrome 會回報連線類型，其他裝置請客戶自己點
+      const t = navigator.connection && navigator.connection.type;
+      const map = { wifi: 'wifi', ethernet: 'wired', cellular: 'cell' };
+      if (map[t]) { SITE.conn = map[t]; SITE.connAuto = true; }
+    })();
+
+    const SITE_Q = [
+      { key: 'conn', label: '現在用什麼方式上網？', opts: [['wifi', 'WiFi 無線'], ['wired', '網路線'], ['cell', '手機行動網路']] },
+      { key: 'plan', label: '家裡申裝的網路速度？', hint: '看帳單或問家人',
+        opts: [[100, '100M'], [300, '300M'], [500, '500M'], [1000, '1G'], [2000, '2G 以上'], ['unknown', '不知道']] },
+      { key: 'wifiCount', label: '手機 WiFi 清單看得到幾個名稱？', hint: '設定 → Wi‑Fi',
+        opts: [['few', '1–5 個'], ['mid', '6–15 個'], ['many', '16 個以上']] },
+      { key: 'distance', label: '離 WiFi 分享器多遠？',
+        opts: [['same', '同一個房間'], ['wall', '隔一道牆'], ['far', '隔兩道牆以上／不同樓層']] }
+    ];
+
+    // 實際 TCP 速度約為無線連線速率的 60–70%，以此反推連線等級
+    const LINK_TIERS = [
+      { max: 60,       range: '60 Mbps 以下',  name: '1x1 或 2.4GHz，訊號偏弱',            phy: '連線速率約 150 Mbps 以下' },
+      { max: 180,      range: '60–180 Mbps',   name: '2.4GHz 2x2，或 5GHz 訊號不佳',        phy: '連線速率約 150–300 Mbps' },
+      { max: 380,      range: '180–380 Mbps',  name: '5GHz 1x1，或 2x2 WiFi 5 訊號中等',    phy: '連線速率約 433–600 Mbps' },
+      { max: 620,      range: '380–620 Mbps',  name: '2x2 WiFi 5，訊號良好',                phy: '連線速率約 866 Mbps' },
+      { max: 950,      range: '620–950 Mbps',  name: '2x2 WiFi 6，或 3x3 WiFi 5',           phy: '連線速率約 1200–1300 Mbps' },
+      { max: Infinity, range: '950 Mbps 以上', name: 'WiFi 6 160MHz／WiFi 7，或 3x3 以上',  phy: '連線速率約 1700 Mbps 以上' }
+    ];
+
+    const sortNum = a => [...a].sort((x, y) => x - y);
+    const meanOf = a => a.reduce((x, y) => x + y, 0) / a.length;
+    const sdOf = a => { const m = meanOf(a); return Math.sqrt(meanOf(a.map(v => (v - m) ** 2))); };
+    function quantile(a, q) {
+      const s = sortNum(a); if (!s.length) return null;
+      const i = (s.length - 1) * q, lo = Math.floor(i), hi = Math.ceil(i);
+      return s[lo] + (s[hi] - s[lo]) * (i - lo);
+    }
+
+    function pingStats(points) {
+      // 第一筆常含連線暖機時間，不列入
+      const p = (points || []).slice(1).filter(v => v > 0 && isFinite(v));
+      if (p.length < 5) return null;
+      const med = quantile(p, .5), min = Math.min(...p), max = Math.max(...p), p95 = quantile(p, .95);
+      let d = 0; for (let i = 1; i < p.length; i++) d += Math.abs(p[i] - p[i - 1]);
+      const jit = d / (p.length - 1);
+      const thr = med + Math.max(25, med * 0.8);       // 明顯高於平常的才算尖峰
+      const spikes = p.filter(v => v > thr).length;
+      const spikeRate = spikes / p.length * 100;
+      const score = Math.round(Math.max(0, 100
+        - Math.min(40, jit / 30 * 40)
+        - Math.min(35, spikeRate * 2.5)
+        - Math.min(25, Math.max(0, p95 - min) / 120 * 25)));
+      const cls = score >= 85 ? 'good' : score >= 65 ? 'warn' : 'poor';
+      return { p, n: p.length, med, min, max, p95, jit, thr, spikes, spikeRate, score, cls,
+        label: { good: '穩定', warn: '普通', poor: '不穩' }[cls] };
+    }
+
+    // 速度波動：只看把頻寬跑滿的那幾次（單次 ≥ 250ms、最大的兩種檔案）
+    function fluxOf(points) {
+      const sat = (points || []).filter(p => p && p.bps > 0 && p.duration >= 250);
+      const sizes = [...new Set(sat.map(p => p.bytes))].sort((a, b) => b - a).slice(0, 2);
+      const v = sat.filter(p => sizes.includes(p.bytes)).map(p => p.bps / 1e6);
+      return v.length >= 3 ? sdOf(v) / meanOf(v) : null;
+    }
+
+    function wifiModel(m, raw) {
+      const ps = pingStats(raw.pings);
+      const flux = { dl: fluxOf(raw.dlPts), ul: fluxOf(raw.ulPts) };
+      const cvs = [flux.dl, flux.ul].filter(v => v != null);
+      const cv = cvs.length ? Math.max(...cvs) : null;
+      const rt = m.l4 ? (m.l4.retrans > 0 ? m.l4.rate : 0) : null;
+      const peak = Math.max(m.dl || 0, m.ul || 0);
+      const plan = typeof SITE.plan === 'number' ? SITE.plan : null;
+      const ratio = plan ? peak / plan : null;
+      const isWifi = SITE.conn === 'wifi' || SITE.conn == null;
+      return { ps, flux, cv, rt, peak, plan, ratio, isWifi };
+    }
+
+    function signalInfer(w) {
+      const ev = []; let s = 0;
+      if (w.rt == null) ev.push(['重傳資料不足', 'na']);
+      // 高速傳輸時 TCP 本來就會用少量丟包試探頻寬上限，1–3% 不一定是訊號問題
+      else if (w.rt > 3) { s += 2; ev.push([`TCP 重傳 ${fmtRate(w.rt)}%（高）`, 'poor']); }
+      else if (w.rt > 1 && w.peak < 300) { s += 1; ev.push([`TCP 重傳 ${fmtRate(w.rt)}%`, 'warn']); }
+      else if (w.rt > 1) ev.push([`重傳 ${fmtRate(w.rt)}%（高速下屬正常）`, 'na']);
+      else ev.push([w.rt === 0 ? '未偵測到重傳' : `重傳 ${fmtRate(w.rt)}%（低）`, 'good']);
+      if (w.cv != null) {
+        if (w.cv > .35) { s += 2; ev.push([`滿載速度起伏 ${fmt(w.cv * 100, 0)}%`, 'poor']); }
+        else if (w.cv > .2) { s += 1; ev.push([`滿載速度起伏 ${fmt(w.cv * 100, 0)}%`, 'warn']); }
+        else ev.push([`速度平穩（起伏 ${fmt(w.cv * 100, 0)}%）`, 'good']);
+      }
+      if (w.peak < 40) { s += 2; ev.push([`最高只到 ${fmt(w.peak, 0)} Mbps`, 'poor']); }
+      else if (w.peak < 120 && (w.ratio == null || w.ratio < .6)) { s += 1; ev.push([`最高 ${fmt(w.peak, 0)} Mbps 偏低`, 'warn']); }
+      if (SITE.distance === 'far') { s += 1; ev.push(['隔兩道牆以上', 'warn']); }
+      else if (SITE.distance === 'same') ev.push(['與分享器同房間', 'good']);
+      const cls = s <= 1 ? 'good' : s <= 3 ? 'warn' : 'poor';
+      const desc = {
+        good: '沒有看到訊號衰減的跡象：重傳少、速度平穩。',
+        warn: '有一些訊號不夠好的跡象，距離、牆壁或干擾讓傳輸偶爾需要重送。',
+        poor: '訊號很可能偏弱：資料常要重送、速度忽高忽低。建議靠近分享器，或加裝 Mesh 節點。'
+      }[cls];
+      return { cls, val: { good: '良好', warn: '普通', poor: '偏弱' }[cls], desc, ev };
+    }
+
+    function airtimeInfer(w) {
+      const ev = []; let s = 0;
+      const ps = w.ps;
+      if (ps) {
+        if (ps.jit > 15) { s += 2; ev.push([`閒置抖動 ${fmt(ps.jit, 1)} ms`, 'poor']); }
+        else if (ps.jit > 6) { s += 1; ev.push([`閒置抖動 ${fmt(ps.jit, 1)} ms`, 'warn']); }
+        else ev.push([`閒置抖動 ${fmt(ps.jit, 1)} ms`, 'good']);
+        if (ps.spikeRate > 15) { s += 2; ev.push([`延遲尖峰 ${ps.spikes}/${ps.n} 次`, 'poor']); }
+        else if (ps.spikeRate > 5) { s += 1; ev.push([`延遲尖峰 ${ps.spikes}/${ps.n} 次`, 'warn']); }
+        else ev.push([`延遲尖峰 ${ps.spikes}/${ps.n} 次`, 'good']);
+      }
+      // 速度起伏大、重傳卻不多：比較像在排隊等空檔，不是訊號差
+      // 瀏覽器量上傳的時間誤差較大，這裡只看下載的起伏
+      const dcv = w.flux.dl ?? w.flux.ul;
+      if (dcv != null && dcv > .25 && (w.rt ?? 0) < 1) { s += 1; ev.push(['速度起伏大但重傳少', 'warn']); }
+      // 客戶回報的 WiFi 數量只加重判斷：實測沒有壅塞跡象時，不單憑數量就判定擁擠
+      const measured = s;
+      if (SITE.wifiCount === 'many') {
+        if (measured > 0) { s += 2; ev.push(['附近 WiFi 16 個以上', 'poor']); }
+        else { s += 1; ev.push(['附近 WiFi 多，但這次沒測到影響', 'warn']); }
+      } else if (SITE.wifiCount === 'mid') {
+        if (measured > 0) s += 1;
+        ev.push(['附近 WiFi 6–15 個', measured > 0 ? 'warn' : 'na']);
+      } else if (SITE.wifiCount === 'few') ev.push(['附近 WiFi 少', 'good']);
+      const cls = s <= 1 ? 'good' : s <= 3 ? 'warn' : 'poor';
+      const desc = {
+        good: '頻道不擠，傳輸不太需要排隊等空檔。',
+        warn: '頻道有點擠，偶爾要等其他裝置或鄰居的 WiFi 講完話才能傳。',
+        poor: '頻道壅塞：延遲常常突然拉高。若連在 2.4GHz 建議改連 5GHz，並由工程師調整頻道與頻寬。'
+      }[cls];
+      return { cls, val: { good: '低', warn: '中', poor: '高' }[cls], desc, ev };
+    }
+
+    function linkInfer(w) {
+      const idx = LINK_TIERS.findIndex(t => w.peak < t.max);
+      const tier = LINK_TIERS[idx];
+      if (SITE.conn === 'wired') return { idx: -1, cls: null, val: '有線連線', desc: '沒有經過 WiFi，不需要判讀無線連線等級。' };
+      if (SITE.conn === 'cell') return { idx: -1, cls: null, val: '行動網路', desc: '使用 4G／5G，不需要判讀 WiFi 連線等級。' };
+      let val, desc, cls = 'warn', bound = false;
+      if (w.ratio != null && w.ratio >= .8) {
+        bound = true; cls = 'good';
+        val = `至少：${tier.name}`;
+        desc = `已跑到申裝速度的 ${fmt(Math.min(w.ratio, 1.2) * 100, 0)}%，瓶頸在外部線路，WiFi 實際上限可能更高。`;
+      } else if (w.ratio != null) {
+        val = `約：${tier.name}`;
+        cls = w.ratio < .5 ? 'poor' : 'warn';
+        desc = `只跑到申裝速度的 ${fmt(w.ratio * 100, 0)}%，瓶頸在 WiFi 或上網裝置本身。`;
+      } else {
+        // 不知道申裝速度時，實測值只能證明「至少」到這個等級
+        bound = true;
+        val = `至少：${tier.name}`;
+        desc = `還不知道申裝速度。實測 ${fmt(w.peak, 0)} Mbps 代表 WiFi 至少有這個等級；若申裝速度跟實測差不多，WiFi 上限可能更高，若申裝明顯更高，WiFi 就是瓶頸。請在上方點選申裝速度。`;
+      }
+      return { idx, cls, val, desc, bound };
+    }
+
+    function wifiCountInfer() {
+      const c = SITE.wifiCount;
+      if (!c) return { cls: null, val: '請客戶回報', desc: '瀏覽器無法掃描附近的 WiFi。請打開手機「設定 → Wi‑Fi」，數一下清單上有幾個名稱，在上方點選。' };
+      return {
+        few:  { cls: 'good', val: '1–5 個 · 少',      desc: '附近干擾少，頻道選擇空間大。' },
+        mid:  { cls: 'warn', val: '6–15 個 · 中等',   desc: '2.4GHz 容易擠，建議手機改連 5GHz。' },
+        many: { cls: 'poor', val: '16 個以上 · 密集', desc: '2.4GHz 幾乎一定壅塞。建議用 5GHz／6GHz，並由工程師調整頻道與頻寬。' }
+      }[c];
+    }
+
+    function responseInfer(ps) {
+      if (!ps) return { cls: null, val: '資料不足', desc: '延遲樣本太少。', ev: [] };
+      const cls = ps.med <= 45 ? 'good' : ps.med <= 80 ? 'warn' : 'poor';
+      const ev = [[`最快 ${fmt(ps.min, 0)} ms`, 'na'], [`一般 ${fmt(ps.med, 0)} ms`, cls], [`偶爾 ${fmt(ps.p95, 0)} ms`, ps.p95 - ps.min > 40 ? 'warn' : 'na']];
+      let desc = { good: '點網頁、開 App 反應很快。', warn: '一般使用沒問題，遊戲與視訊互動會略慢。', poor: '回應偏慢，點下去要等一下才有反應。' }[cls];
+      if (ps.min <= 20 && ps.med - ps.min > 15) desc += '最快值很低但平常被拉高，代表線路本身快，延遲多半耗在無線端排隊。';
+      return { cls, val: `${fmt(ps.med, 0)} ms`, desc, ev,
+        word: ps.med <= 20 ? '極快' : ps.med <= 45 ? '快' : ps.med <= 80 ? '普通' : '慢' };
+    }
+
+    function wifiConclusion(m, w, sig, air) {
+      const out = [];
+      if (SITE.conn === 'wired') out.push(['good', '這次用網路線連線，沒有經過 WiFi，無線項目僅供參考。']);
+      if (SITE.conn === 'cell') out.push(['warn', '這次用手機行動網路，不是家裡的 WiFi，請改連 WiFi 再測一次才能判讀。']);
+      if (w.isWifi) {
+        if (sig.cls === 'poor') out.push(['poor', '<b>無線訊號偏弱</b>：建議靠近分享器，或在這個位置加裝 Mesh 節點。']);
+        if (air.cls === 'poor') out.push(['poor', '<b>頻道壅塞</b>：附近 WiFi 或裝置太多，若連在 2.4GHz 建議改連 5GHz，並由工程師調整頻道。']);
+        if (sig.cls === 'warn' && air.cls !== 'poor') out.push(['warn', '<b>訊號普通</b>：距離或牆壁造成部分衰減，重要裝置建議靠近分享器。']);
+        if (air.cls === 'warn' && sig.cls !== 'poor') out.push(['warn', '<b>頻道有點擠</b>：尖峰時段可能變慢，若連在 2.4GHz 可改連 5GHz。']);
+        if (w.ratio != null && w.ratio < .6 && sig.cls === 'good' && air.cls === 'good')
+          out.push(['warn', `<b>速度只有申裝的 ${fmt(w.ratio * 100, 0)}%</b>，但訊號和頻道都正常，問題可能在上網裝置（舊手機、1x1 網卡）或分享器效能。`]);
+        if (w.ratio != null && w.ratio >= .8) out.push(['good', 'WiFi 已經跑到申裝速度，無線端不是速度瓶頸。']);
+      }
+      if (m.bloat != null && m.bloat > BENCH.bufferbloat.avg)
+        out.push([m.bloat > BENCH.bufferbloat.poor ? 'poor' : 'warn', `<b>分享器緩衝膨脹</b>：有人上傳或下載時延遲增加 ${fmt(m.bloat, 0)} ms，需要開啟 QoS／SQM。`]);
+      if (w.ps && w.ps.cls === 'poor' && !out.some(o => o[0] === 'poor')) out.push(['poor', '<b>Ping 不穩</b>：延遲常突然拉高，視訊與遊戲會卡頓。']);
+      if (!out.length) out.push(['good', '無線狀態良好，沒有看到訊號衰減或頻道壅塞。']);
+      const rank = { poor: 0, warn: 1, good: 2 };
+      return out.sort((a, b) => rank[a[0]] - rank[b[0]]);
+    }
+
+    const SRC = { meas: ['src-meas', '實測'], infer: ['src-infer', '推估'], user: ['src-user', '客戶回報'] };
+    function wfCard({ name, src, val, cls, desc, ev = [], wide = false, extra = '' }) {
+      return `
+        <div class="wf ${wide ? 'wide' : ''}">
+          <div class="wf-head"><span class="wf-name">${name}</span><span class="src ${SRC[src][0]}">${SRC[src][1]}</span></div>
+          <div class="wf-val t-${cls || 'na'}">${val}</div>
+          <div class="wf-desc">${desc}</div>
+          ${ev.length ? `<div class="ev">${ev.map(([t, c]) => `<span class="ev-${c}">${t}</span>`).join('')}</div>` : ''}
+          ${extra}
+        </div>`;
+    }
+
+    function pingChart(ps) {
+      const W = 600, H = 130, pad = 8;
+      const top = Math.max(ps.max, ps.thr) * 1.1;
+      const x = i => pad + (W - 2 * pad) * (i / Math.max(1, ps.n - 1));
+      const y = v => H - pad - (H - 2 * pad) * Math.min(1, v / top);
+      const line = ps.p.map((v, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)} ${y(v).toFixed(1)}`).join(' ');
+      const dots = ps.p.map((v, i) => v > ps.thr ? `<circle cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="6" fill="#ef4444" />` : '').join('');
+      return `
+        <div class="ping-chart">
+          <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="每次 ping 的延遲，紅點為延遲尖峰">
+            <line x1="${pad}" x2="${W - pad}" y1="${y(ps.med).toFixed(1)}" y2="${y(ps.med).toFixed(1)}" stroke="rgba(34,197,94,.55)" stroke-width="2" stroke-dasharray="6 6" />
+            <line x1="${pad}" x2="${W - pad}" y1="${y(ps.thr).toFixed(1)}" y2="${y(ps.thr).toFixed(1)}" stroke="rgba(239,68,68,.35)" stroke-width="1.5" stroke-dasharray="3 6" />
+            <path d="${line}" fill="none" stroke="#06d6d6" stroke-width="3" stroke-linejoin="round" />
+            ${dots}
+          </svg>
+          <div class="ping-legend"><span><i class="lg-med"></i>平常延遲 ${fmt(ps.med, 0)} ms</span><span><i class="lg-spk"></i>尖峰（高於 ${fmt(ps.thr, 0)} ms）</span><span>共 ${ps.n} 次 ping，依時間排列</span></div>
+        </div>`;
+    }
+
+    function tierLadder(link) {
+      if (link.idx < 0) return '';
+      const rows = LINK_TIERS.map((t, i) => ({ t, i })).reverse().map(({ t, i }) => `
+        <li class="tier ${i === link.idx ? 'on' : ''} ${link.bound && i > link.idx ? 'maybe' : ''}">
+          <span class="tier-name">${t.name}</span><span class="tier-range">實測 ${t.range}</span>
+        </li>`).join('');
+      return `<ul class="tier-list">${rows}</ul>
+        <div class="wf-foot">手機、筆電多半是 2x2，分享器標示 3x3、4x4 對手機幫助有限。推估以「實測速度約為無線連線速率 60–70%」換算，僅供參考。</div>`;
+    }
+
+    function wifiSection() {
+      const q = SITE_Q.map(qq => `
+        <div class="q-row" role="radiogroup" aria-label="${qq.label}">
+          <div class="q-label">${qq.label}${qq.hint ? `<span class="q-hint">${qq.hint}</span>` : ''}${qq.key === 'conn' && SITE.connAuto ? '<span class="q-auto">已自動偵測</span>' : ''}</div>
+          <div class="chips">${qq.opts.map(([v, t]) => `<button type="button" class="chip-btn" role="radio" data-q="${qq.key}" data-v="${v}" aria-checked="${String(SITE[qq.key] === v)}">${t}</button>`).join('')}</div>
+        </div>`).join('');
+      return `
+      <div class="section" id="wifiSection">
+        <div class="section-title">無線網路現場分析</div>
+        <div class="card site-q">
+          <div class="site-q-head">📝 請點選現場狀況，讓判讀更準確<span>（不點也能看結果，點了會即時更新）</span></div>
+          ${q}
+        </div>
+        <div id="wifiBody"></div>
+      </div>`;
+    }
+
+    function engineerSection() {
+      return `
+      <div class="section">
+        <div class="section-title">傳給蓋斯克工程師</div>
+        <div class="card">
+          <div class="eng-hint">按下按鈕複製文字，貼到 LINE 傳給蓋斯克，工程師不用到現場就能判斷。</div>
+          <pre class="eng-text" id="engText"></pre>
+          <div class="actions" style="margin-top:14px">
+            <button class="btn btn-primary" id="copyBtn" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" /><path d="M5 15V5a2 2 0 0 1 2-2h10" /></svg>
+              <span>複製文字</span>
+            </button>
+          </div>
+        </div>
+      </div>`;
+    }
+
+    function deviceText() {
+      const ua = navigator.userAgent;
+      const os = /iPhone/.test(ua) ? 'iPhone' : /iPad/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1) ? 'iPad'
+        : /Android/.test(ua) ? 'Android' : /Mac OS X/.test(ua) ? 'Mac' : /Windows/.test(ua) ? 'Windows' : '其他';
+      const br = /Edg\//.test(ua) ? 'Edge' : /Line\//.test(ua) ? 'LINE 內建' : /CriOS|Chrome\//.test(ua) ? 'Chrome' : /Firefox|FxiOS/.test(ua) ? 'Firefox' : /Safari\//.test(ua) ? 'Safari' : '其他';
+      return `${os} / ${br}`;
+    }
+
+    function engineerText(m, w, sig, air, link, resp, concl) {
+      const opt = (key) => { const q = SITE_Q.find(x => x.key === key); const o = q.opts.find(([v]) => v === SITE[key]); return o ? o[1] : '未填'; };
+      const ps = w.ps;
+      const stamp = new Date().toLocaleString('zh-TW', { hour12: false });
+      const L = [
+        `【蓋斯克遠端測速報告】${stamp}`,
+        `連線：${opt('conn')}${SITE.connAuto ? '（自動偵測）' : ''}｜申裝：${opt('plan')}｜附近WiFi：${opt('wifiCount')}｜距離：${opt('distance')}`,
+        `下載 ${fmt(m.dl, 1)} / 上傳 ${fmt(m.ul, 1)} Mbps${w.ratio != null ? `（申裝的 ${fmt(w.ratio * 100, 0)}%）` : ''}`,
+        ps ? `Ping 一般 ${fmt(ps.med, 0)} / 最快 ${fmt(ps.min, 0)} / P95 ${fmt(ps.p95, 0)} / 最高 ${fmt(ps.max, 0)} ms` : 'Ping 資料不足',
+        ps ? `Ping 穩定度 ${ps.score}/100（${ps.label}）｜抖動 ${fmt(ps.jit, 1)} ms｜尖峰 ${ps.spikes}/${ps.n}` : '',
+        `負載延遲 下載 ${fmt(m.dLat, 0)} / 上傳 ${fmt(m.uLat, 0)} ms${m.bloat != null ? `（+${fmt(m.bloat, 0)}）` : ''}`,
+        m.l4 ? `TCP 重傳 ${m.l4.retrans === 0 ? '0' : fmtRate(m.l4.rate)}%（${m.l4.retrans.toLocaleString()} / ${m.l4.sent.toLocaleString()} 封包）` : 'TCP 重傳 資料不足',
+        `滿載速度起伏 下載 ${w.flux.dl != null ? fmt(w.flux.dl * 100, 0) + '%' : '—'} / 上傳 ${w.flux.ul != null ? fmt(w.flux.ul * 100, 0) + '%' : '—'}`,
+        `推估：訊號 ${w.isWifi ? sig.val : '不適用'}｜Airtime 壅塞 ${w.isWifi ? air.val : '不適用'}｜連線等級 ${link.val.replace(/^(約|至少)：/, '$1 ')}`,
+        `判讀：${concl.map(c => c[1].replace(/<[^>]+>/g, '')).join(' ')}`,
+        `裝置：${deviceText()}`
+      ];
+      return L.filter(Boolean).join('\n');
+    }
+
+    let wifiCtx = null;
+    function renderWifi() {
+      if (!wifiCtx) return;
+      const { m, raw } = wifiCtx;
+      const w = wifiModel(m, raw);
+      const sig = signalInfer(w), air = airtimeInfer(w), link = linkInfer(w), cnt = wifiCountInfer(), resp = responseInfer(w.ps);
+      const concl = wifiConclusion(m, w, sig, air);
+      const na = { cls: null, val: '不適用', desc: SITE.conn === 'wired' ? '網路線連線，沒有無線訊號可判讀。' : '行動網路連線，不是 WiFi。', ev: [] };
+      const ps = w.ps;
+      const head = concl[0];
+      $('wifiBody').innerHTML = `
+        <div class="wifi-summary ws-${head[0]}">
+          <div class="ws-label">🧠 無線網路判讀</div>
+          <div class="ws-head">${head[1]}</div>
+          ${concl.length > 1 ? `<ul class="ws-more">${concl.slice(1).map(c => `<li class="t-${c[0]}-dot">${c[1]}</li>`).join('')}</ul>` : ''}
+          ${SITE.conn == null ? '<div class="ws-note">尚未選擇上網方式，以下先當作 WiFi 判讀。</div>' : ''}
+        </div>
+        <div class="wf-grid">
+          ${wfCard({ name: 'Ping 穩定度', src: 'meas', wide: true,
+            val: ps ? `${ps.score}<small> / 100 · ${ps.label}</small>` : '資料不足', cls: ps && ps.cls,
+            desc: ps ? `延遲忽高忽低的程度。抖動 ${fmt(ps.jit, 1)} ms，${ps.n} 次 ping 中有 ${ps.spikes} 次明顯拉高。` : '延遲樣本太少。',
+            ev: ps ? [[`一般 ${fmt(ps.med, 0)} ms`, 'na'], [`最快 ${fmt(ps.min, 0)}`, 'na'], [`P95 ${fmt(ps.p95, 0)}`, 'na'], [`最高 ${fmt(ps.max, 0)} ms`, ps.max > ps.thr ? 'warn' : 'na']] : [],
+            extra: ps ? pingChart(ps) : '' })}
+          ${wfCard({ name: '回應速度', src: 'meas', val: resp.word ? `${resp.val}<small> · ${resp.word}</small>` : resp.val, cls: resp.cls, desc: resp.desc, ev: resp.ev })}
+          ${wfCard({ name: '無線訊號品質', src: 'infer', ...(w.isWifi ? sig : na) })}
+          ${wfCard({ name: 'Airtime 頻道壅塞', src: 'infer', ...(w.isWifi ? air : na) })}
+          ${wfCard({ name: '附近 WiFi 數量', src: 'user', ...cnt })}
+          ${wfCard({ name: '無線連線等級（幾串流）', src: 'infer', wide: true, val: link.val, cls: link.cls, desc: link.desc, extra: tierLadder(link) })}
+        </div>`;
+      $('engText').textContent = engineerText(m, w, sig, air, link, resp, concl);
+      window.__lastWifi = { w: { ...w, ps: ps && { ...ps, p: undefined } }, sig: sig.val, air: air.val, link: link.val, concl: concl.map(c => c[1]) };
+    }
+
+    function setupWifi(m, raw) {
+      wifiCtx = { m, raw };
+      $('wifiSection').addEventListener('click', ev => {
+        const b = ev.target.closest('.chip-btn');
+        if (!b) return;
+        const key = b.dataset.q, rawV = b.dataset.v;
+        const v = key === 'plan' && rawV !== 'unknown' ? Number(rawV) : rawV;
+        SITE[key] = SITE[key] === v ? null : v;   // 再點一次取消
+        if (key === 'conn') SITE.connAuto = false;
+        b.parentElement.querySelectorAll('.chip-btn').forEach(x => x.setAttribute('aria-checked', String(x === b && SITE[key] === v)));
+        const auto = b.closest('.q-row').querySelector('.q-auto');
+        if (auto && key === 'conn') auto.remove();
+        renderWifi();
+      });
+      $('copyBtn').addEventListener('click', copyEngineer);
+      renderWifi();
+    }
+
+    async function copyEngineer(ev) {
+      const btn = ev.currentTarget, label = btn.querySelector('span');
+      const text = $('engText').textContent;
+      let ok = false;
+      try { await navigator.clipboard.writeText(text); ok = true; } catch (e) {
+        // 舊版瀏覽器或 LINE 內建瀏覽器：改用選取複製
+        const ta = document.createElement('textarea');
+        ta.value = text; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;top:0;opacity:0';
+        document.body.appendChild(ta); ta.select();
+        try { ok = document.execCommand('copy'); } catch (e2) {}
+        ta.remove();
+      }
+      label.textContent = ok ? '已複製，可以貼到 LINE 了' : '無法自動複製，請長按上方文字複製';
+      setTimeout(() => { label.textContent = '複製文字'; }, 3000);
+    }
+
     function methodCard() {
       return `
       <div class="section">
         <div class="section-title">測試方法</div>
         <div class="card method">
           <ul>
-            <li>延遲與抖動：閒置時對 Cloudflare 最近節點送出約 26 次小請求，取中位數與變化量。</li>
+            <li>延遲與抖動：閒置時對 Cloudflare 最近節點送出約 36 次小請求（測速前、中、後各一段），取中位數與變化量。</li>
+            <li>無線網路分析：瀏覽器無法讀取 WiFi 訊號強度、天線數或掃描附近網路，因此由延遲尖峰、速度波動、TCP 重傳與最高速度推估，並搭配客戶點選的現場資訊判讀。標示「實測」「推估」「客戶回報」以示區別。</li>
             <li>下載／上傳：由 100 KB 逐步加大到 250 MB／50 MB，單次傳輸超過 1 秒即停止加大，取第 90 百分位數。</li>
             <li>負載延遲：下載與上傳進行中同步量測延遲，用來判斷 Bufferbloat。</li>
             <li>連線穩定度：讀取 Cloudflare 伺服器回報的 TCP 重傳統計。瀏覽器無法直接量測丟包，因此只在伺服器偵測到重傳時才判定為問題。</li>
